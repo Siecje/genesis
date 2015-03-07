@@ -1427,3 +1427,7 @@ hr {
 .bg-gray-gradient-mac {
   background: linear-gradient(to bottom, #ececec 0%, #d5d5d5 100%);
 }
+
+.draggable {
+  -webkit-app-region: drag;
+}

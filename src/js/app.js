@@ -14,6 +14,10 @@
     for(var i in posts){
       if (posts[i].title === postTitle){
         post = posts[i];
+        postMarkdown.value = post.text;
+        var postHTML = converter.makeHtml(postMarkdown.value);
+        document.getElementById('postHTML').innerHTML = postHTML;
+        title.value = post.title;
       }
     }
   }

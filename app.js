@@ -21,13 +21,15 @@
     var postFiles = getFiles('posts/');
     var posts = [];
     var post = {};
-    var p = {};
     for (var i in postFiles){
-      p = fs.readFile(postFiles[i], 'utf8', function (err, data) {
+      post = fs.readFileSync(postFiles[i], 'utf8', function (err, data) {
         if (err) {
           return console.log(err);
         }
-        var lines = data.split('\n');
+        return data;
+      });
+      if (post){
+        var lines = post.split('\n');
         var p = {};
         p.title = lines[0];
 
@@ -35,11 +37,9 @@
         //p.text = lines.substring(1, lines.length).join('\n');
         p.text = lines.join('\n');
         p.id = uuid.v4();
-        return p;
-      })
-      posts.push(p);
+        posts.push(p);
+      }
     }
-    console.log(posts);
     return posts;
   }
 

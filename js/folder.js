@@ -37,15 +37,9 @@ function getFieldFromFile(field, fileData){
 }
 
 function getPostFromFile(fileData){
-  var start = 0;
-  var lines = fileData.split('\n');
-  for(var i in lines){
-    if(lines[i].indexOf(':') < 0){
-      start = i;
-    }
-  }
+  var start = fileData.indexOf('\n\n');
 
-  return lines.splice(2, lines.length-1).join('\n');
+  return fileData.substring(start+2, fileData.length-1);
 }
 
 function loadPosts(directory){
@@ -87,6 +81,9 @@ function getFiles (dir){
 }
 
 function savePost(){
+  if(post.title === '' && post.text === ''){
+    return;
+  }
   if(posts.indexOf(post) < 0){
     posts.push(post);
   }

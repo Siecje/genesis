@@ -20,7 +20,7 @@
       </span>
 
       <span class='center col col-4'>
-        <div class='rounded bg-white top-bar-bs'>
+        <div class='rounded bg-white top-bar-bs mtn1'>
           <input class='small rounded fieldset-reset full-width center p-title mtn1 mb0' type='text' id='title' placeholder='Title' />
         </div>
       </span>
@@ -42,32 +42,34 @@
     <aside class='z1 absolute top-bar-offset left-0 right-0 bottom-0 overflow-y-auto sidebar-width bg-med brd' id='sidebar'>
 
       <!-- Sidebar top area -->
-      <div class='bg-light bbl px1 py-status-bar'>
-        <p class='smaller m0'>Blog Posts</p>
+      <div class='absolute left-0 top-0 right-0 bottom-offset overflow-y-auto'>
+        <div class='bg-light bbl px1 py-status-bar'>
+          <p class='smaller m0'>Blog Posts</p>
+        </div>
+
+        <ul id="posts" class='list-reset m0'>
+          <!-- Posts are added here -->
+        </ul>
+
+        <div class='bg-light bbl btl px1 py-status-bar'>
+          <p class='smaller m0'>Site Pages</p>
+        </div>
+
+        <ul class='list-reset m0'>
+          <li>
+            <a href='' class='small m0 px1 py1 block'>home.md</a>
+          </li>
+          <li>
+            <a href='' class='small m0 px1 py1 block'>about.md</a>
+          </li>
+          <li>
+            <a href='' class='small m0 px1 py1 block'>contact.md</a>
+          </li>
+          <li>
+            <a href='' class='small m0 px1 py1 block'>blog.md</a>
+          </li>
+        </ul>
       </div>
-
-      <ul id="posts" class='list-reset m0'>
-        <!-- Posts are added here -->
-      </ul>
-
-      <div class='bg-light bbl btl px1 py-status-bar'>
-        <p class='smaller m0'>Site Pages</p>
-      </div>
-
-      <ul class='list-reset m0'>
-        <li>
-          <a href='' class='small m0 px1 py1 block'>home.md</a>
-        </li>
-        <li>
-          <a href='' class='small m0 px1 py1 block'>about.md</a>
-        </li>
-        <li>
-          <a href='' class='small m0 px1 py1 block'>contact.md</a>
-        </li>
-        <li>
-          <a href='' class='small m0 px1 py1 block'>blog.md</a>
-        </li>
-      </ul>
 
       <!-- Sidebar fixed bottom area -->
       <div class='absolute left-0 bottom-0 right-0 bg-light btl bbl p1'>

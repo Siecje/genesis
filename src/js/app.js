@@ -21,7 +21,6 @@
 
   function getFieldFromFile(field, fileData){
     var lines = fileData.split('\n');
-    console.log(lines); // ""
     for(var i in lines){
       if(lines[i].search(field) > -1){
         return lines[i].substring(lines[i].search(':')+1, lines[i].length).trim();
@@ -30,27 +29,15 @@
   }
 
   function getPostFromFile(fileData){
-    console.log(fileData); // contents
-    console.log(fileData.split(' ')); // ""
-    console.log(fileData.indexOf('\n\n')); //""
-
     var start = 0;
     var lines = fileData.split('\n');
-    console.log(lines);
     for(var i in lines){
       if(lines[i].indexOf(':') < 0){
         start = i;
       }
     }
-    // console.log(start);
 
-    // console.log(lines);
-    //console.log(lines.slice(parseInt(start), fileData.split('\n').length));
-    var postText = lines.slice(parseInt(start),
-        fileData.split('\n').length-1)
-      .join('\n');
-    // console.log(postText);
-    return fileData;
+    return fileData.split('\n').splice(2, lines.length-1).join('\n');
   }
 
   function loadPosts(){
@@ -92,10 +79,9 @@
   }
 
   function savePost(){
-    var postFiles = getFiles('posts/');
-    var postNum = postFiles.length;
+    posts.push(post);
 
-    fs.writeFile('posts/' + postNum + '_' + post.title + '.md',
+    fs.writeFile('posts/' + posts.indexOf(post) + 1  + '_' + post.title + '.md',
       'title: ' + post.title + '\n\n' +
       post.text,
         function(err) {

@@ -21,13 +21,10 @@
     "frame": true,
     "toolbar": true,
     "width": 800,
-    "height": 500
+    "height": 600
   },
   "license": "MIT",
   "dependencies": {
-    "gulp": "^3.8.11",
-    "gulp-concat": "^2.5.2",
-    "require-dir": "^0.1.0",
     "showdown": "^0.4.0"
   }
 }

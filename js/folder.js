@@ -37,8 +37,8 @@ function getFieldFromFile(field, fileData){
 }
 
 function getPostFromFile(fileData){
+  // Post attributes and post content must be separated by a blank line
   var start = fileData.indexOf('\n\n');
-
   return fileData.substring(start+2, fileData.length-1);
 }
 

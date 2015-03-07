@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset='utf-8'>
+    <title>Static Site Gen UI</title>
+    <meta name='viewport' content='width=device-width, initial-scale=1, maximum-scale=1'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+    <link rel='stylesheet' href='style.css'>
+  </head>
+
+  <body class='full-viewport'>
+
+    <!-- Top Bar -->
+    <div class='top-bar z2 absolute top-0 left-0 right-0 bg-gray-gradient-mac bbl py1'>
+
+      <span class='col col-4 px1'>
+        <p class='small'><a href='#' onclick='savePost()'>Save</a></p>
+        <p class='small'><a href='#' onclick='newPost()'>New</a></p>
+      </span>
+
+      <span class='center col col-4'>
+        <div class='rounded bg-white top-bar-bs'>
+          <p class='small'><input type="text" id="title" placeholder="Title"></p>
+        </div>
+      </span>
+
+      <span class='col col-4 px1'>
+        <ul class='icon-group-wrapper right top-bar-bs'>
+          <li id='toggleLeft' class='icon icon-group-wrapper-brl'>
+            <img src='icon/left-window-toggle.svg' />
+          </li>
+          <li id='toggleRight' class='icon'>
+            <img src='icon/right-window-toggle.svg' />
+          </li>
+        </ul>
+      </span>
+
+    </div>
+
+    <!-- Sidebar -->
+    <aside class='z1 absolute top-bar-offset left-0 right-0 bottom-0 overflow-y-auto sidebar-width bg-med brd' id='sidebar'>
+
+      <!-- Sidebar top area -->
+      <div class='bg-light bbl px1 py-status-bar'>
+        <p class='smaller m0'>Blog Posts</p>
+      </div>
+
+      <ul id="posts" class='list-reset m0'>
+        <!-- Posts are added here -->
+      </ul>
+
+      <div class='bg-light bbl btl px1 py-status-bar'>
+        <p class='smaller m0'>Site Pages</p>
+      </div>
+
+      <ul class='list-reset m0'>
+        <li>
+          <a href='' class='small m0 px1 py1 block'>home.md</a>
+        </li>
+        <li>
+          <a href='' class='small m0 px1 py1 block'>about.md</a>
+        </li>
+        <li>
+          <a href='' class='small m0 px1 py1 block'>contact.md</a>
+        </li>
+        <li>
+          <a href='' class='small m0 px1 py1 block'>blog.md</a>
+        </li>
+      </ul>
+
+      <!-- Sidebar fixed bottom area -->
+      <div class='absolute left-0 bottom-0 right-0 bg-light btl bbl p1'>
+        <input class='fieldset-reset m0 py1 px1 full-width smaller bl rounded' type='text' placeholder='Find...' />
+      </div>
+
+    </aside>
+
+    <!-- Writing Area -->
+    <main class='z1 absolute overflow-y-auto top-bar-offset bottom-0 left-0 sidebar-offset right-0' id='main'>
+
+      <!-- Markdown Editor Area -->
+      <div class='col col-6 bll brl' id='middleSection'>
+
+        <div class='bg-white bbl px1 py-status-bar'>
+          <p class='smaller m0'>Markdown Area</p>
+        </div>
+
+        <textarea id='postMarkdown' class='p2 full-viewport absolute-center' autofocus></textarea>
+
+      </div>
+
+      <!-- Preview Area -->
+      <div class='col col-6' id='rightSection'>
+
+        <div class='bg-white bbl px1 py-status-bar'>
+          <p class='smaller m0'>Rendered Markdown</p>
+        </div>
+
+        <div class='p2'>
+          <div id='postHTML'></div>
+        </div>
+      </div>
+
+    </main>
+
+  <!-- Scripts -->
+  <script src='showdown.js'></script>
+  <script src='uuid.js'></script>
+  <script src='app.js'></script>
+  </body>
+</html>

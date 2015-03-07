@@ -1,11 +1,31 @@
 (function() {
   'use strict';
   var fs = require('fs');
+  var gui = require('nw.gui');
+  var win = gui.Window.get();
 
   var converter = new Showdown.converter();
 
   var postMarkdown = document.getElementById('postMarkdown');
   var title = document.getElementById('title');
+
+  document.getElementById('minimize').addEventListener('click', function() {
+
+    // Just minimize the window on click
+    win.minimize();
+  });
+
+  document.getElementById('maximize').addEventListener('click', function() {
+
+    // Maximizes the window
+    win.maximize();
+  });
+
+  document.getElementById('close').addEventListener('click', function() {
+
+    // Close the window
+    win.close();
+  });
 
   var posts = loadPosts();
 

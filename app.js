@@ -5,9 +5,13 @@
   var converter = new Showdown.converter();
 
   var postMarkdown = document.getElementById('postMarkdown');
+  var title = document.getElementById('title');
 
   var posts = loadPosts();
-  var post = {};
+  var post = JSON.parse(localStorage.getItem('post')) || {};
+  if (post.id){
+    loadPost(post.id);
+  }
 
   showPosts();
 
@@ -46,6 +50,8 @@
       return val;
     }));
     showPosts();
+    localStorage.setItem('post', JSON.stringify(post));
+    location.reload();
   }
   // I don't know why it can't find savePost without this
   window.savePost = savePost;
@@ -96,7 +102,6 @@
     document.getElementById('postHTML').innerHTML = postHTML;
   });
 
-  var title = document.getElementById('title');
   title.addEventListener('keyup', function(){
     post.title = title.value;
   });

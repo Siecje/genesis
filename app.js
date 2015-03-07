@@ -13,6 +13,29 @@
 
   showPosts();
 
+  function getFieldFromFile(field, fileData){
+    var lines = fileData.split('\n');
+    for(var i in lines){
+      if(lines[i].search(field) > -1){
+        return lines[i].substring(lines[i].search(':')+1, lines[i].length);
+      }
+    }
+  }
+
+  function getPostFromFile(fileData){
+    var postText = '';
+    var start = 0;
+    for(var i in fileData.split('\n')){
+      if(fileData[i].indexOf(':') < 0){
+        start = i;
+      }
+    }
+    var lines = fileData.split('\n');
+    return lines.slice(start,
+        fileData.split('\n').length-1)
+      .join('\n');
+  }
+
   function loadPosts(){
     // TODO: use config value
     var postFiles = getFiles('posts/');
@@ -25,14 +48,11 @@
         }
         return data;
       });
-      if (post){
+      if(post){
         var lines = post.split('\n');
         var p = {};
-        p.title = lines[0];
-
-        // TODO: remove title
-        //p.text = lines.substring(1, lines.length).join('\n');
-        p.text = lines.join('\n');
+        p.title = getFieldFromFile('title', post);
+        p.text = getPostFromFile(post);
         posts.push(p);
       }
     }

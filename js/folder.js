@@ -5,35 +5,31 @@
  */
 var fs = require('fs');
 var Showdown = require('showdown');
-
-
-
 // Initialize Showdown converter
 var converter = new Showdown.converter();
 
+// Variables that start with dom are DOM elements
+var domMarkdown = document.getElementById('postMarkdown');
+var domHtml = document.getElementById('postHTML');
+var domTitle = document.getElementById('title');
 
+window.savePost = savePost;
+window.loadPost = loadPost;
+window.newPost = newPost;
 
+// TODO: use config value for posts directory
+var posts = loadPosts('posts/');
 
-var postMarkdown = document.getElementById('postMarkdown');
-var title = document.getElementById('title');
+// Global to hold the current post to display/edit
 var post = {};
-var posts = loadPosts();
-
-// load previous post from localStorage
-var postTitle = localStorage.getItem('post') || '';
-if(postTitle){
-  for(var i in posts){
-    if (posts[i].title === postTitle){
-      post = posts[i];
-      postMarkdown.value = post.text;
-      var postHTML = converter.makeHtml(postMarkdown.value);
-      document.getElementById('postHTML').innerHTML = postHTML;
-      title.value = post.title;
-    }
-  }
-}
 
 showPosts();
+
+function updateView(){
+  domTitle.value = post.title;
+  domMarkdown.value = post.text;
+  domHtml.innerHTML = converter.makeHtml(domMarkdown.value);
+}
 
 function getFieldFromFile(field, fileData){
   var lines = fileData.split('\n');
@@ -56,9 +52,9 @@ function getPostFromFile(fileData){
   return lines.splice(2, lines.length-1).join('\n');
 }
 
-function loadPosts(){
-  // TODO: use config value for posts directory
-  var postFiles = getFiles('posts/');
+function loadPosts(directory){
+
+  var postFiles = getFiles(directory);
   var posts = [];
   var post = {};
   for (var i in postFiles){
@@ -111,21 +107,13 @@ function savePost(){
   });
 
   showPosts();
-  localStorage.setItem('post', post.title);
-  location.reload();
 }
-// I don't know why it can't find savePost without this
-window.savePost = savePost;
-window.loadPost = loadPost;
-window.newPost = newPost;
 
 function loadPost(postTitle){
   for(var i in posts){
     if (posts[i].title === postTitle){
       post = posts[i];
-
-      localStorage.setItem('post', post.title);
-      location.reload();
+      updateView();
     }
   }
 }
@@ -142,22 +130,18 @@ function showPosts(){
 }
 
 function newPost() {
-  post.title = '';
-  post.text = '';
-  postMarkdown.value = post.text;
-  document.getElementById('postHTML').innerHTML = '';
-  title.value = post.title;
+  post = {title: '', text: ''};
+  updateView();
 }
 
 // 'Keyup' only is recent browsers, in old ones you
 // should use 'DOMContentModified'
-postMarkdown.addEventListener('keyup', function() {
+domMarkdown.addEventListener('keyup', function() {
   // Keep post in sync
-  post.text = postMarkdown.value;
-  var postHTML = converter.makeHtml(postMarkdown.value);
-  document.getElementById('postHTML').innerHTML = postHTML;
+  post.text = domMarkdown.value;
+  domHtml.innerHTML = converter.makeHtml(domMarkdown.value);
 });
 
-title.addEventListener('keyup', function(){
-  post.title = title.value;
+domTitle.addEventListener('keyup', function(){
+  post.title = domTitle.value;
 });

@@ -5,16 +5,17 @@
 
   var postMarkdown = document.getElementById('postMarkdown');
   var title = document.getElementById('title');
-
+  var post = {};
   var posts = loadPosts();
 
   // load previous post from localStorage
-  var post = JSON.parse(localStorage.getItem('post')) || {};
-  if(post){
-    title.value = post.title;
-    postMarkdown.value = post.text;
-    var postHTML = converter.makeHtml(postMarkdown.value);
-    document.getElementById('postHTML').innerHTML = postHTML;
+  var postTitle = localStorage.getItem('post') || '';
+  if(postTitle){
+    for(var i in posts){
+      if (posts[i].title === postTitle){
+        post = posts[i];
+      }
+    }
   }
 
   showPosts();
@@ -37,7 +38,7 @@
       }
     }
 
-    return fileData.split('\n').splice(2, lines.length-1).join('\n');
+    return lines.splice(2, lines.length-1).join('\n');
   }
 
   function loadPosts(){
@@ -79,7 +80,9 @@
   }
 
   function savePost(){
-    posts.push(post);
+    if(posts.indexOf(post) < 0){
+      posts.push(post);
+    }
 
     fs.writeFile('posts/' + posts.indexOf(post) + 1  + '_' + post.title + '.md',
       'title: ' + post.title + '\n\n' +
@@ -93,7 +96,7 @@
     });
 
     showPosts();
-    localStorage.setItem('post', JSON.stringify(post));
+    localStorage.setItem('post', post.title);
     location.reload();
   }
   // I don't know why it can't find savePost without this
@@ -106,7 +109,7 @@
       if (posts[i].title === postTitle){
         post = posts[i];
 
-        localStorage.setItem('post', JSON.stringify(post));
+        localStorage.setItem('post', post.title);
         location.reload();
       }
     }

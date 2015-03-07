@@ -15,7 +15,7 @@
   "author": "Cody Scott, Ben Tranter",
   "window": {
     "frame": true,
-    "toolbar": false,
+    "toolbar": true,
     "width": 800,
     "height": 500
   },

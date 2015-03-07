@@ -1,6 +1,6 @@
 (function() {
-
   'use strict';
+  var fs = require('fs');
 
   var converter = new Showdown.converter();
 
@@ -8,6 +8,7 @@
   var title = document.getElementById('title');
 
   var posts = loadPosts();
+  console.log(posts);
   var post = JSON.parse(localStorage.getItem('post')) || {};
   if (post.id){
     loadPost(post.id);
@@ -16,7 +17,44 @@
   showPosts();
 
   function loadPosts(){
-    return JSON.parse(localStorage.getItem('posts')) || [];
+    // TODO: use config value
+    var postFiles = getFiles('posts/');
+    var posts = [];
+    var post = {};
+    var p = {};
+    for (var i in postFiles){
+      p = fs.readFile(postFiles[i], 'utf8', function (err, data) {
+        if (err) {
+          return console.log(err);
+        }
+        var lines = data.split('\n');
+        var p = {};
+        p.title = lines[0];
+
+        // TODO: remove title
+        //p.text = lines.substring(1, lines.length).join('\n');
+        p.text = lines.join('\n');
+        p.id = uuid.v4();
+        return p;
+      })
+      posts.push(p);
+    }
+    console.log(posts);
+    return posts;
+  }
+
+  function getFiles (dir){
+    var files_ = files_ || [];
+    var files = fs.readdirSync(dir);
+    for (var i in files){
+        var name = dir + '/' + files[i];
+        if (!fs.statSync(name).isDirectory()){
+          if(name.indexOf('.keep') < 0){
+            files_.push(name);
+          }
+        }
+    }
+    return files_;
   }
 
   function savePost(){
@@ -24,31 +62,20 @@
       post.id = uuid.v4();
     }
 
-    var posts = JSON.parse(localStorage.getItem('posts')) || [];
-    var found = false;
-    for(var i=0;i<posts.length;i++){
-      if (posts[i].id === post.id){
-        found = true;
-        posts[i].title = post.title;
-        posts[i].text = post.text;
-      }
-    }
-    if(!found){
-      posts.push(post);
-    }
+    var postFiles = getFiles('posts/');
+    var postNum = postFiles.length;
 
-    // Save it in localstorage
-    // http://stackoverflow.com/questions/9382167/serializing-object-that-contains-cyclic-object-value
-    var seen = [];
-    localStorage.setItem('posts', JSON.stringify(posts, function(key, val) {
-      if (val != null && typeof val == "object"){
-        if (seen.indexOf(val) >= 0){
-          return;
-        }
-        seen.push(val);
-      }
-      return val;
-    }));
+    fs.writeFile('posts/' + postNum + '_' + post.title + '.md',
+      'title: ' + post.title + '\n\n' +
+      post.text,
+        function(err) {
+          if(err) {
+              console.log(err);
+          } else {
+              console.log("The file was saved!");
+          }
+    });
+
     showPosts();
     localStorage.setItem('post', JSON.stringify(post));
     location.reload();
@@ -58,12 +85,18 @@
   window.loadPost = loadPost;
   window.newPost = newPost;
 
-  function loadPost(id){
-    for(var i=0;i<posts.length;i++){
-      if (posts[i].id === id){
-        post.id = id;
-        post.title = posts[i].title;
-        post.text = posts[i].text;
+  function loadPost(postTitle){
+    var postFiles = getFiles('posts');
+
+    for(var i in postFiles){
+      if (postFiles[i] === postTitle){
+        fs.readFile(postTitle, 'utf8', function (err, data) {
+          if (err) {
+            return console.log(err);
+          }
+          post.text = data;
+          post.title = postTitle; // TODO: remove .md and convert - to spaces
+        });
       }
     }
     postMarkdown.value = post.text;
@@ -77,10 +110,13 @@
   }
 
   function showPosts(){
+    if (posts.length === 0){
+      return;
+    }
     var elem = document.querySelector('#posts');
     elem.innerHTML = '';
-    for(var i=0;i<posts.length;i++){
-      elem.innerHTML += "<li><a href='#' onclick='loadPost(\"" + posts[i].id + "\")' class='small m0 px1 py1 block'>" + posts[i].title + "</a></li>";
+    for(var i in posts){
+      elem.innerHTML += "<li><a href='#' onclick='loadPost(\"" + posts[i].title + "\")' class='small m0 px1 py1 block'>" + posts[i].title + "</a></li>";
     }
   }
 

@@ -8,35 +8,53 @@
 
   var posts = loadPosts();
 
+  // load previous post from localStorage
   var post = JSON.parse(localStorage.getItem('post')) || {};
+  if(post){
+    title.value = post.title;
+    postMarkdown.value = post.text;
+    var postHTML = converter.makeHtml(postMarkdown.value);
+    document.getElementById('postHTML').innerHTML = postHTML;
+  }
 
   showPosts();
 
   function getFieldFromFile(field, fileData){
     var lines = fileData.split('\n');
+    console.log(lines); // ""
     for(var i in lines){
       if(lines[i].search(field) > -1){
-        return lines[i].substring(lines[i].search(':')+1, lines[i].length);
+        return lines[i].substring(lines[i].search(':')+1, lines[i].length).trim();
       }
     }
   }
 
   function getPostFromFile(fileData){
-    var postText = '';
+    console.log(fileData); // contents
+    console.log(fileData.split(' ')); // ""
+    console.log(fileData.indexOf('\n\n')); //""
+
     var start = 0;
-    for(var i in fileData.split('\n')){
-      if(fileData[i].indexOf(':') < 0){
+    var lines = fileData.split('\n');
+    console.log(lines);
+    for(var i in lines){
+      if(lines[i].indexOf(':') < 0){
         start = i;
       }
     }
-    var lines = fileData.split('\n');
-    return lines.slice(start,
+    // console.log(start);
+
+    // console.log(lines);
+    //console.log(lines.slice(parseInt(start), fileData.split('\n').length));
+    var postText = lines.slice(parseInt(start),
         fileData.split('\n').length-1)
       .join('\n');
+    // console.log(postText);
+    return fileData;
   }
 
   function loadPosts(){
-    // TODO: use config value
+    // TODO: use config value for posts directory
     var postFiles = getFiles('posts/');
     var posts = [];
     var post = {};
@@ -50,8 +68,9 @@
       if(post){
         var lines = post.split('\n');
         var p = {};
-        p.title = getFieldFromFile('title', post);
         p.text = getPostFromFile(post);
+        p.title = getFieldFromFile('title', post);
+
         posts.push(p);
       }
     }
@@ -97,27 +116,14 @@
   window.newPost = newPost;
 
   function loadPost(postTitle){
-    var postFiles = getFiles('posts');
+    for(var i in posts){
+      if (posts[i].title === postTitle){
+        post = posts[i];
 
-    for(var i in postFiles){
-      if (postFiles[i] === postTitle){
-        fs.readFile(postTitle, 'utf8', function (err, data) {
-          if (err) {
-            return console.log(err);
-          }
-          post.text = data;
-          post.title = postTitle; // TODO: remove .md and convert - to spaces
-        });
+        localStorage.setItem('post', JSON.stringify(post));
+        location.reload();
       }
     }
-    postMarkdown.value = post.text;
-    title.value = post.title;
-    var postHTML = converter.makeHtml(postMarkdown.value);
-    document.getElementById('postHTML').innerHTML = postHTML;
-  }
-
-  function editPost(post){
-    postMarkdown.value = post.text;
   }
 
   function showPosts(){

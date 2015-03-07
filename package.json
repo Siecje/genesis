@@ -1,0 +1,22 @@
+{
+  "name": "genesis",
+  "version": "0.0.1",
+  "description": "Generate static sites without using the command line.",
+  "main": "index.html",
+  "scripts": {
+    "test": "jasmine-node tests"
+  },
+  "keywords": [
+    "static",
+    "site",
+    "generator",
+    "genesis"
+  ],
+  "author": "Cody Scott, Ben Tranter",
+  "window": {
+    "toolbar": true,
+    "width": 800,
+    "height": 500
+  },
+  "license": "MIT"
+}

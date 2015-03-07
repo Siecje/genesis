@@ -1413,6 +1413,10 @@ hr {
   bottom: 45px;
 }
 
+.menu-bar {
+  line-height: 1rem;
+}
+
 /**
  * Mac UI Styles
  */

@@ -13,10 +13,6 @@ var domMarkdown = document.getElementById('postMarkdown');
 var domHtml = document.getElementById('postHTML');
 var domTitle = document.getElementById('title');
 
-window.savePost = savePost;
-window.loadPost = loadPost;
-window.newPost = newPost;
-
 // TODO: use config value for posts directory
 var posts = loadPosts('posts/');
 
@@ -53,7 +49,6 @@ function getPostFromFile(fileData){
 }
 
 function loadPosts(directory){
-
   var postFiles = getFiles(directory);
   var posts = [];
   var post = {};
@@ -77,17 +72,18 @@ function loadPosts(directory){
 }
 
 function getFiles (dir){
-  var files_ = files_ || [];
+  var fileNames = [];
   var files = fs.readdirSync(dir);
+  var name = '';
   for (var i in files){
-      var name = dir + '/' + files[i];
-      if (!fs.statSync(name).isDirectory()){
-        if(name.indexOf('.keep') < 0){
-          files_.push(name);
-        }
+    name = dir + '/' + files[i];
+    if (!fs.statSync(name).isDirectory()){
+      if(name.indexOf('.keep') < 0){
+        fileNames.push(name);
       }
+    }
   }
-  return files_;
+  return fileNames;
 }
 
 function savePost(){
@@ -100,11 +96,12 @@ function savePost(){
     post.text,
       function(err) {
         if(err) {
-            console.log(err);
+          console.log(err);
         } else {
-            console.log("The file was saved!");
+          console.log("The file was saved!");
         }
-  });
+      }
+  );
 
   showPosts();
 }

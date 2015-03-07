@@ -176,7 +176,6 @@ input[type=url],
 input[type=week] {
   box-sizing: border-box;
   height: 1rem;
-  padding: .5rem .5rem;
   vertical-align: middle;
   -webkit-appearance: none;
 }
@@ -380,6 +379,10 @@ button,
 /** 
  * Utility White Space
  */
+
+.p0 {
+  padding: 0;
+}
 
 .m0 {
   margin: 0;
@@ -1395,6 +1398,15 @@ hr {
 
 .icon-active {
   background: #e2e2e2;
+}
+
+.mtn1 {
+  margin-top: -2px;
+}
+
+.p-title {
+  padding-top: 10px;
+  padding-bottom: 10px;
 }
 
 /**

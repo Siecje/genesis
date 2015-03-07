@@ -33,22 +33,14 @@ exports.newShortcutOptions = {
 
 exports.toggleRight = function(right, middle, toggle) {
 
-  var rightSection = right;
-  var middleSection = middle;
-  var toggleButton = toggle;
-
-  rightSection.classList.toggle('hide');
-  middleSection.classList.toggle('col-12');
-  toggleButton.classList.toggle('icon-active');
+  right.classList.toggle('hide');
+  middle.classList.toggle('col-12');
+  toggle.classList.toggle('icon-active');
 };
 
 exports.toggleLeft = function(left, middle, toggle) {
 
-  var leftSection = left;
-  var middleSection = middle;
-  var toggleButton = toggle;
-
-  leftSection.classList.toggle('hide');
-  middleSection.classList.toggle('sidebar-offset');
-  toggleButton.classList.toggle('icon-active');
+  left.classList.toggle('hide');
+  middle.classList.toggle('sidebar-offset');
+  toggle.classList.toggle('icon-active');
 };

@@ -8,11 +8,8 @@
   var title = document.getElementById('title');
 
   var posts = loadPosts();
-  console.log(posts);
+
   var post = JSON.parse(localStorage.getItem('post')) || {};
-  if (post.id){
-    loadPost(post.id);
-  }
 
   showPosts();
 
@@ -36,7 +33,6 @@
         // TODO: remove title
         //p.text = lines.substring(1, lines.length).join('\n');
         p.text = lines.join('\n');
-        p.id = uuid.v4();
         posts.push(p);
       }
     }
@@ -58,10 +54,6 @@
   }
 
   function savePost(){
-    if (!post.id){
-      post.id = uuid.v4();
-    }
-
     var postFiles = getFiles('posts/');
     var postNum = postFiles.length;
 
@@ -122,7 +114,6 @@
 
   function newPost(){
     post.title = '';
-    post.id = '';
     post.text = '';
     postMarkdown.value = post.text;
     document.getElementById('postHTML').innerHTML = '';

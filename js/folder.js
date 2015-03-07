@@ -6,10 +6,14 @@
 var fs = require('fs');
 var Showdown = require('showdown');
 
+
+
 // Initialize Showdown converter
 var converter = new Showdown.converter();
 
-// Create object for export
+
+
+
 var postMarkdown = document.getElementById('postMarkdown');
 var title = document.getElementById('title');
 var post = {};
@@ -130,14 +134,14 @@ function showPosts(){
   if (posts.length === 0){
     return;
   }
-  var elem = document.querySelector('#posts');
+  var elem = document.getElementById('posts');
   elem.innerHTML = '';
   for(var i in posts){
     elem.innerHTML += "<li><a href='#' onclick='loadPost(\"" + posts[i].title + "\")' class='small m0 px1 py1 block'>" + posts[i].title + "</a></li>";
   }
 }
 
-function newPost(){
+function newPost() {
   post.title = '';
   post.text = '';
   postMarkdown.value = post.text;

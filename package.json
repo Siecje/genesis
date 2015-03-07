@@ -6,7 +6,7 @@
     "type": "git",
     "url": "http://github.com/siecje/genesis"
   },
-  "main": "src/index.html",
+  "main": "index.html",
   "scripts": {
     "test": "jasmine-node tests"
   },

@@ -1401,12 +1401,16 @@ hr {
 }
 
 .mtn1 {
-  margin-top: -2px;
+  margin-top: -4px;
 }
 
 .p-title {
   padding-top: 10px;
   padding-bottom: 10px;
+}
+
+.bottom-offset {
+  bottom: 45px;
 }
 
 /**

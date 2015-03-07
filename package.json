@@ -2,7 +2,11 @@
   "name": "genesis",
   "version": "0.0.1",
   "description": "Generate static sites without using the command line.",
-  "main": "index.html",
+ "repository": {
+    "type": "git",
+    "url": "http://github.com/siecje/genesis"
+  },
+  "main": "src/index.html",
   "scripts": {
     "test": "jasmine-node tests"
   },
@@ -19,5 +23,10 @@
     "width": 800,
     "height": 500
   },
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "gulp": "^3.8.11",
+    "gulp-concat": "^2.5.2",
+    "require-dir": "^0.1.0"
+  }
 }

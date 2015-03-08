@@ -2,4 +2,4 @@
 posts/
 pages/
 node_modules/
-dist/
+build/

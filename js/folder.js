@@ -17,11 +17,13 @@ var domTitle = document.getElementById('title');
 
 // TODO: use config value for posts directory
 var posts = loadPosts('output/blog/');
+var pages = loadPosts('output/');
 
 // Global to hold the current post to display/edit
 var post = {};
 
-showPosts();
+show(posts, 'posts');
+show(pages, 'pages');
 
 function updateView(){
   domTitle.value = post.title;
@@ -43,6 +45,7 @@ function getPostFromFile(fileData){
 }
 
 function loadPosts(directory){
+  var type = directory === 'output/blog/' ? 'post' : 'page';
   var postFiles = getFiles(directory);
   var posts = [];
   var post = {};
@@ -61,6 +64,7 @@ function loadPosts(directory){
       var p = {};
       p.text = post;
       p.title = getFieldFromFileName(postFiles[i]);
+      p.type = type;
 
       posts.push(p);
     }
@@ -87,11 +91,16 @@ function savePost(){
   if(post.title === '' && post.text === ''){
     return;
   }
-  if(posts.indexOf(post) < 0){
+
+  var path = post.type === 'post' ? 'output/blog/' : 'output/';
+  if(post.type === 'post' && posts.indexOf(post) < 0){
     posts.push(post);
   }
+  else if(post.type === 'page' && pages.indexOf(post) < 0){
+    pages.push(post);
+  }
 
-  fs.writeFile('output/blog/' + post.title + '.md',
+  fs.writeFile(path + post.title + '.md',
     post.text,
       function(err) {
         if(err) {
@@ -102,30 +111,41 @@ function savePost(){
       }
   );
 
-  showPosts();
+  show(posts, 'posts');
+  show(pages, 'pages');
   exec('./node_modules/harp/bin/harp compile output build', function(error, stdout){
     console.log(error);
     console.log(stdout);
   });
 }
 
-function loadPost(postTitle){
-  for(var i in posts){
-    if (posts[i].title === postTitle){
-      post = posts[i];
-      updateView();
+function load(type, postTitle){
+  if (type === 'post'){
+    for(var i in posts){
+      if (posts[i].title === postTitle){
+        post = posts[i];
+        updateView();
+      }
+    }
+  }
+  else if(type === 'page'){
+    for(var i in pages){
+      if (pages[i].title === postTitle){
+        post = pages[i];
+        updateView();
+      }
     }
   }
 }
 
-function showPosts(){
-  if (posts.length === 0){
+function show(items, elemId){
+  if (items.length === 0){
     return;
   }
-  var elem = document.getElementById('posts');
+  var elem = document.getElementById(elemId);
   elem.innerHTML = '';
-  for(var i in posts){
-    elem.innerHTML += "<li><a href='#' onclick='loadPost(\"" + posts[i].title + "\")' class='small m0 px1 py1 block'>" + posts[i].title + "</a></li>";
+  for(var i in items){
+    elem.innerHTML += "<li><a href='#' onclick='load(\"" + items[i].type + "\", \"" + items[i].title + "\")' class='small m0 px1 py1 block'>" + items[i].title + "</a></li>";
   }
 }
 

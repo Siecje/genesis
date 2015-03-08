@@ -149,8 +149,8 @@ function show(items, elemId){
   }
 }
 
-function newPost() {
-  post = {title: '', text: ''};
+function newItem(type) {
+  post = {title: '', text: '', type: type};
   updateView();
 }
 

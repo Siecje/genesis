@@ -26,12 +26,7 @@
           <li class='icon inline-block icon-group-wrapper-brl'>
             <i class='fa fa-floppy-o gray blue-h' onclick='savePost()'></i>
           </li>
-          <li class='icon inline-block icon-group-wrapper-brl'>
-            <i class='fa fa-pencil-square-o gray blue-h' onclick='newPost()'></i>
-          </li>
         </ul>
-        <!-- <p class='inline-block small'><a href='#' onclick='savePost()'>Save</a></p>
-        <p class='inline-block small'><a href='#' onclick='newPost()'>New</a></p> -->
       </span>
 
       <span class='center col col-4'>
@@ -69,7 +64,7 @@
       <div class='absolute left-0 top-0 right-0 bottom-offset overflow-y-auto'>
         <div class='bg-light bbl px1 py-status-bar'>
           <p class='inline-block smaller m0'>Blog Posts</p>
-          <i class='fa fa-pencil-square-o right gray blue-h icon-margin' onclick='newPost()'></i>
+          <i class='fa fa-pencil-square-o right gray blue-h icon-margin' onclick='newItem("post")'></i>
         </div>
 
         <ul id='posts' class='list-reset m0'>
@@ -78,7 +73,7 @@
 
         <div class='bg-light bbl btl px1 py-status-bar'>
           <p class='inline-block smaller m0'>Site Pages</p>
-          <i class='fa fa-pencil-square-o right gray blue-h icon-margin' onclick='newPost()'></i>
+          <i class='fa fa-pencil-square-o right gray blue-h icon-margin' onclick='newItem("page")'></i>
         </div>
 
         <ul id='pages' class='list-reset m0'>

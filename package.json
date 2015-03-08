@@ -25,6 +25,8 @@
   },
   "license": "MIT",
   "dependencies": {
-    "showdown": "^0.4.0"
+    "harp": "^0.15.2",
+    "showdown": "^0.4.0",
+    "surge": "^0.7.4"
   }
 }

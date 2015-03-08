@@ -7,6 +7,8 @@ var fs = require('fs');
 var Showdown = require('showdown');
 // Initialize Showdown converter
 var converter = new Showdown.converter();
+var exec = require('child_process').exec;
+
 
 // Variables that start with dom are DOM elements
 var domMarkdown = document.getElementById('postMarkdown');
@@ -14,7 +16,7 @@ var domHtml = document.getElementById('postHTML');
 var domTitle = document.getElementById('title');
 
 // TODO: use config value for posts directory
-var posts = loadPosts('posts/');
+var posts = loadPosts('output/blog/');
 
 // Global to hold the current post to display/edit
 var post = {};
@@ -27,13 +29,11 @@ function updateView(){
   domHtml.innerHTML = converter.makeHtml(domMarkdown.value);
 }
 
-function getFieldFromFile(field, fileData){
-  var lines = fileData.split('\n');
-  for(var i in lines){
-    if(lines[i].search(field) > -1){
-      return lines[i].substring(lines[i].search(':')+1, lines[i].length).trim();
-    }
-  }
+function getFieldFromFileName(fileName){
+  var startOfFileName = fileName.lastIndexOf('//') + 2;
+  var endOfFileName = fileName.substring(startOfFileName, fileName.length).indexOf('.');
+  endOfFileName += startOfFileName;
+  return fileName.substring(startOfFileName, endOfFileName);
 }
 
 function getPostFromFile(fileData){
@@ -47,6 +47,9 @@ function loadPosts(directory){
   var posts = [];
   var post = {};
   for (var i in postFiles){
+    if(postFiles[i].indexOf('.md') < 0){
+      continue;
+    }
     post = fs.readFileSync(postFiles[i], 'utf8', function (err, data) {
       if (err) {
         return console.log(err);
@@ -56,8 +59,8 @@ function loadPosts(directory){
     if(post){
       var lines = post.split('\n');
       var p = {};
-      p.text = getPostFromFile(post);
-      p.title = getFieldFromFile('title', post);
+      p.text = post;
+      p.title = getFieldFromFileName(postFiles[i]);
 
       posts.push(p);
     }
@@ -88,8 +91,7 @@ function savePost(){
     posts.push(post);
   }
 
-  fs.writeFile('posts/' + posts.indexOf(post) + 1  + '_' + post.title + '.md',
-    'title: ' + post.title + '\n\n' +
+  fs.writeFile('output/blog/' + post.title + '.md',
     post.text,
       function(err) {
         if(err) {
@@ -101,6 +103,10 @@ function savePost(){
   );
 
   showPosts();
+  exec('./node_modules/harp/bin/harp compile output build', function(error, stdout){
+    console.log(error);
+    console.log(stdout);
+  });
 }
 
 function loadPost(postTitle){

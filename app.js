@@ -8,7 +8,10 @@ var gui = require('nw.gui');
 
 var win = gui.Window.get();
 
-
+// Native Mac Menu
+var nativeMenuBar = new gui.Menu({ type: 'menubar' });
+nativeMenuBar.createMacBuiltin('My App');
+win.menu = nativeMenuBar;
 
 /**
  * Keyboard Shortcuts

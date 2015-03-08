@@ -1067,6 +1067,14 @@ hr {
   background-color: #eff0f2;
 }
 
+.bg-gray {
+  background-color: #585858;
+}
+
+.gray {
+  color: #585858;
+}
+
 .blue {
   color: #4480fa;
 }
@@ -1373,7 +1381,6 @@ hr {
 }
 
 .icon-group-wrapper {
-  margin: 0;
   margin-top: -2px;
   padding: 0;
   min-width: 0;
@@ -1391,7 +1398,7 @@ hr {
 
 .icon {
   display: inline-block;
-  padding: 3px 5px;
+  padding: 2px 8px;
 }
 
 .icon:hover {

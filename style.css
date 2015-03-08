@@ -1381,7 +1381,6 @@ hr {
 }
 
 .icon-group-wrapper {
-  margin: 0;
   margin-top: -2px;
   padding: 0;
   min-width: 0;
@@ -1399,7 +1398,7 @@ hr {
 
 .icon {
   display: inline-block;
-  padding: 2px 5px;
+  padding: 2px 8px;
 }
 
 .icon:hover {

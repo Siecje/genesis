@@ -11,8 +11,30 @@ var win = gui.Window.get();
 
 // Native Mac Menu
 var nativeMenuBar = new gui.Menu({ type: 'menubar' });
-nativeMenuBar.createMacBuiltin('My App');
+nativeMenuBar.createMacBuiltin('Genesis');
 win.menu = nativeMenuBar;
+
+// File menu
+var file = new gui.Menu();
+file.append(new gui.MenuItem({
+  label: 'New Post',
+  click : function () {
+    newItem('post');
+  }
+}));
+
+file.append(new gui.MenuItem({
+  label: 'New Page',
+  click : function () {
+    newItem('page');
+  }
+}));
+
+win.menu.insert(new gui.MenuItem({
+        label: 'File',
+        submenu: file
+    }), 1);
+
 
 /**
 * Keyboard Shortcuts

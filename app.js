@@ -10,31 +10,33 @@ var liveServer = require('live-server');
 var win = gui.Window.get();
 
 // Native Mac Menu
-var nativeMenuBar = new gui.Menu({ type: 'menubar' });
-nativeMenuBar.createMacBuiltin('Genesis');
-win.menu = nativeMenuBar;
+if (process.platform === 'darwin'){
+  var nativeMenuBar = new gui.Menu({ type: 'menubar' });
+  nativeMenuBar.createMacBuiltin('Genesis');
+  win.menu = nativeMenuBar;
 
-// File menu
-var file = new gui.Menu();
-file.append(new gui.MenuItem({
-  label: 'New Post',
-  click : function () {
-    newItem('post');
-  }
-}));
+  // File menu
+  var file = new gui.Menu();
+  file.append(new gui.MenuItem({
+    label: 'New Post',
+    click : function () {
+      newItem('post');
+    }
+  }));
 
-file.append(new gui.MenuItem({
-  label: 'New Page',
-  click : function () {
-    newItem('page');
-  }
-}));
+  file.append(new gui.MenuItem({
+    label: 'New Page',
+    click : function () {
+      newItem('page');
+    }
+  }));
 
-win.menu.insert(new gui.MenuItem({
-        label: 'File',
-        submenu: file
-    }), 1);
-
+  win.menu.insert(
+    new gui.MenuItem({
+      label: 'File',
+      submenu: file
+  }), 1);
+}
 
 /**
 * Keyboard Shortcuts
@@ -98,10 +100,10 @@ document.getElementById('preview').addEventListener('click', function() {
 
     // Start a live server on click
     var params = {
-      port: 8080, // Set the server port. Defaults to 8080. 
-      host: '0.0.0.0', // Set the address to bind to. Defaults to 0.0.0.0. 
-      root: './build', // Set root directory that's being server. Defaults to cwd. 
-      noBrowser: false // When true, it won't load your browser by default. 
+      port: 8080, // Set the server port. Defaults to 8080.
+      host: '0.0.0.0', // Set the address to bind to. Defaults to 0.0.0.0.
+      root: './build', // Set root directory that's being server. Defaults to cwd.
+      noBrowser: false // When true, it won't load your browser by default.
     };
 
     liveServer.start(params);

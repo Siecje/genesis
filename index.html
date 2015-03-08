@@ -21,8 +21,17 @@
           <img src='icon/ui-yellow.svg' id='minimize' />
           <img src='icon/ui-green.svg' id='maximize'/>
         </span>
-        <p class='inline-block small'><a href='#' onclick='savePost()'>Save</a></p>
-        <p class='inline-block small'><a href='#' onclick='newPost()'>New</a></p>
+
+        <ul class='icon-group-wrapper top-bar-bs inline-block'>
+          <li class='icon inline-block icon-group-wrapper-brl'>
+            <i class='fa fa-floppy-o gray blue-h' onclick='savePost()'></i>
+          </li>
+          <li class='icon inline-block icon-group-wrapper-brl'>
+            <i class='fa fa-pencil-square-o gray blue-h' onclick='newPost()'></i>
+          </li>
+        </ul>
+        <!-- <p class='inline-block small'><a href='#' onclick='savePost()'>Save</a></p>
+        <p class='inline-block small'><a href='#' onclick='newPost()'>New</a></p> -->
       </span>
 
       <span class='center col col-4'>
@@ -34,16 +43,19 @@
       <span class='col col-4 px1'>
         <ul class='icon-group-wrapper right top-bar-bs'>
           <li id='toggleLeft' class='icon icon-group-wrapper-brl'>
-            <img src='icon/left-window-toggle.svg' />
+            <i class='fa fa-caret-square-o-left gray blue-h'></i>
           </li>
           <li id='toggleRight' class='icon'>
-            <img src='icon/right-window-toggle.svg' />
+            <i class='fa fa-caret-square-o-right gray blue-h'></i>
           </li>
         </ul>
 
-        <ul class='icon-group-wrapper right top-bar-bs'>
-          <li class'icon icon-group-wrapper'>
-            <i class='fa fa-cloud-upload'></i>
+        <ul class='icon-group-wrapper right top-bar-bs inline-block'>
+          <li class='icon inline-block icon-group-wrapper-brl'>
+            <i class='fa fa-cloud-upload gray blue-h'></i>
+          </li>
+          <li class='icon inline-block'>
+            <i class='fa fa-refresh gray blue-h'></i>
           </li>
         </ul>
       </span>

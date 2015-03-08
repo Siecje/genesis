@@ -1427,6 +1427,10 @@ hr {
   line-height: 1rem;
 }
 
+.icon-margin {
+  margin-top: 4px;
+}
+
 /**
  * Mac UI Styles
  */

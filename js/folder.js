@@ -4,11 +4,13 @@
  * Module dependencies
  */
 var fs = require('fs');
+var exec = require('child_process').exec;
+var uuid = require('uuid');
 var Showdown = require('showdown');
+
+//var Promise = require("bluebird");
 // Initialize Showdown converter
 var converter = new Showdown.converter();
-var exec = require('child_process').exec;
-
 
 // Variables that start with dom are DOM elements
 var domMarkdown = document.getElementById('postMarkdown');
@@ -16,8 +18,8 @@ var domHtml = document.getElementById('postHTML');
 var domTitle = document.getElementById('title');
 
 // TODO: use config value for posts directory
-var posts = loadPosts('output/blog/');
-var pages = loadPosts('output/');
+var posts = loadPosts('output/blog/', function(result){posts = result;});
+var pages = loadPosts('output/', function(result){pages = result;});
 
 // Global to hold the current post to display/edit
 var post = {type: 'post'};
@@ -44,32 +46,56 @@ function getPostFromFile(fileData){
   return fileData.substring(start+2, fileData.length-1);
 }
 
-function loadPosts(directory){
+function loadPosts(directory, callback){
   var type = directory === 'output/blog/' ? 'post' : 'page';
   var postFiles = getFiles(directory);
   var posts = [];
-  var post = {};
-  for (var i in postFiles){
-    if(postFiles[i].indexOf('.md') < 0){
-      continue;
-    }
-    post = fs.readFileSync(postFiles[i], 'utf8', function (err, data) {
-      if (err) {
-        return console.log(err);
-      }
-      return data;
-    });
-    if(post){
-      var lines = post.split('\n');
-      var p = {};
-      p.text = post;
-      p.title = getFieldFromFileName(postFiles[i]);
-      p.type = type;
 
-      posts.push(p);
+  var dataJson = {};
+  fs.readFile(directory + '_data.json', function(err, data) {
+    if (err) {
+      if (err.code === "ENOENT") {
+        /* File doesn't exist, setting {} instead. */
+        dataJson = {};
+        doneGettingJSON(callback);
+      } else {
+        /* Some other kind of error happened - you need to handle it, somehow. */
+      }
+    }else {
+      dataJson = JSON.parse(data);
+      return doneGettingJSON(callback);
     }
+  });
+
+  function doneGettingJSON(callback){
+    var post = {};
+    var p = {};
+    var lines;
+    for (var i in postFiles){
+      if(postFiles[i].indexOf('.md') < 0){
+        continue;
+      }
+      post = fs.readFileSync(postFiles[i], 'utf8', function (err, data) {
+        if (err) {
+          return console.log(err);
+        }
+        return data;
+      });
+      if(post){
+        lines = post.split('\n');
+        p = {};
+        p.text = post;
+        // p.url is the file name without extension
+        p.url = getFieldFromFileName(postFiles[i]);
+        p.type = type;
+        p.id = dataJson[p.url].id;
+        p.title = dataJson[p.url].title;
+
+        posts.push(p);
+      }
+    }
+    callback(posts)
   }
-  return posts;
 }
 
 function getFiles (dir){
@@ -92,15 +118,22 @@ function savePost(){
     return;
   }
 
+  if(!post.url){
+    post.url = post.title;
+  }
+
   var path = post.type === 'post' ? 'output/blog/' : 'output/';
-  if(post.type === 'post' && posts.indexOf(post) < 0){
+  if(post.type === 'post' && !post.id){
+    post.id = uuid.v4();
     posts.push(post);
   }
-  else if(post.type === 'page' && pages.indexOf(post) < 0){
+  else if(post.type === 'page' && !post.id){
+    post.id = uuid.v4();
     pages.push(post);
   }
 
-  fs.writeFile(path + post.title + '.md',
+  // Write page contents to file
+  fs.writeFile(path + post.url + '.md',
     post.text,
       function(err) {
         if(err) {
@@ -111,12 +144,86 @@ function savePost(){
       }
   );
 
+  // read _data.json and update properties
+  // TODO: code smell duplicated code with loadPosts
+  var dataJson = {};
+  fs.readFile(path + '_data.json', function(err, data) {
+    if (err) {
+      if (err.code === "ENOENT") {
+        /* File doesn't exist, setting {} instead. */
+        dataJson = {};
+        //doneGettingJSON();
+      } else {
+        /* Some other kind of error happened - you need to handle it, somehow. */
+      }
+    }else {
+      dataJson = JSON.parse(data);
+      //return doneGettingJSON();
+    }
+  });
+
+  // iterate through dataJson find the object with the id
+  var postData = {};
+  var urlData;
+  for(var url in dataJson){
+    if(dataJson[url].id === post.id){
+      urlData = url;
+      postData = dataJson[url];
+    }
+  }
+
+  // If it is a new post not in data.json
+  // TODO: is this the best way to check if postData === {}
+  if(postData.length === undefined){
+    urlData = post.url;
+  }
+
+  postData.title = post.title;
+  postData.id = post.id;
+  // If the url is change remove the object for the old url value
+  if (post.url != urlData){
+    delete dataJson[urlData];
+  }
+
+  dataJson[urlData] = postData;
+
+  console.log(dataJson);
+  console.log(JSON.stringify(dataJson));
+  // write dataJson back to _data.json
+  fs.writeFile(path + '_data.json',
+    JSON.stringify(dataJson),
+      function(err) {
+        if(err) {
+          console.log(err);
+        } else {
+          console.log('Saved: ' + path + '_data.json');
+        }
+      }
+  );
+
+  // Delete files that are not a key in dataJson
+  var postFiles = getFiles(path);
+  var index;
+  for(var i in postFiles){
+    // get just the file name without full path or extension
+    index = getFieldFromFileName(postFiles[i]);
+    if(!dataJson[index]){
+      // Delete the file
+      fs.unlink(postFiles[i], function (err) {
+        if (err){
+          throw err;
+        }
+        console.log('successfully deleted ' + postFiles[i]);
+      });
+    }
+  }
+
   show(posts, 'posts');
   show(pages, 'pages');
-  exec('./node_modules/harp/bin/harp compile output build', function(error, stdout){
+  /*exec('./node_modules/harp/bin/harp compile output build', function(error, stdout){
     console.log(error);
     console.log(stdout);
-  });
+  });*/
 }
 
 function deleteActivePost(){

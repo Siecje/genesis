@@ -3,3 +3,5 @@ node_modules/
 build/
 output/*.md
 output/blog/*.md
+output/_data.json
+output/blog/_data.json

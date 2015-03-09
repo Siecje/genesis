@@ -8,7 +8,8 @@ var exec = require('child_process').exec;
 var uuid = require('uuid');
 var Showdown = require('showdown');
 
-//var Promise = require("bluebird");
+var Promise = require("bluebird");
+Promise.promisifyAll(fs);
 // Initialize Showdown converter
 var converter = new Showdown.converter();
 
@@ -18,8 +19,8 @@ var domHtml = document.getElementById('postHTML');
 var domTitle = document.getElementById('title');
 
 // TODO: use config value for posts directory
-var posts = loadPosts('output/blog/', function(result){posts = result;});
-var pages = loadPosts('output/', function(result){pages = result;});
+var posts = loadPosts('output/blog/');
+var pages = loadPosts('output/');
 
 // Global to hold the current post to display/edit
 var post = {type: 'post'};
@@ -46,56 +47,43 @@ function getPostFromFile(fileData){
   return fileData.substring(start+2, fileData.length-1);
 }
 
-function loadPosts(directory, callback){
+function loadPosts(directory){
   var type = directory === 'output/blog/' ? 'post' : 'page';
   var postFiles = getFiles(directory);
   var posts = [];
 
   var dataJson = {};
-  fs.readFile(directory + '_data.json', function(err, data) {
-    if (err) {
-      if (err.code === "ENOENT") {
-        /* File doesn't exist, setting {} instead. */
-        dataJson = {};
-        doneGettingJSON(callback);
-      } else {
-        /* Some other kind of error happened - you need to handle it, somehow. */
-      }
-    }else {
-      dataJson = JSON.parse(data);
-      return doneGettingJSON(callback);
-    }
-  });
+  var data = fs.readFileSync(directory + '_data.json');
+  dataJson = JSON.parse(data);
 
-  function doneGettingJSON(callback){
-    var post = {};
-    var p = {};
-    var lines;
-    for (var i in postFiles){
-      if(postFiles[i].indexOf('.md') < 0){
-        continue;
-      }
-      post = fs.readFileSync(postFiles[i], 'utf8', function (err, data) {
-        if (err) {
-          return console.log(err);
-        }
-        return data;
-      });
-      if(post){
-        lines = post.split('\n');
-        p = {};
-        p.text = post;
-        // p.url is the file name without extension
-        p.url = getFieldFromFileName(postFiles[i]);
-        p.type = type;
-        p.id = dataJson[p.url].id;
-        p.title = dataJson[p.url].title;
-
-        posts.push(p);
-      }
+  var post = {};
+  var p = {};
+  var lines;
+  for (var i in postFiles){
+    if(postFiles[i].indexOf('.md') < 0){
+      continue;
     }
-    callback(posts)
+    post = fs.readFileSync(postFiles[i], 'utf8', function (err, data) {
+      if (err) {
+        return console.log(err);
+      }
+      return data;
+    });
+    if(post){
+      lines = post.split('\n');
+      p = {};
+      p.text = post;
+      // p.url is the file name without extension
+      p.url = getFieldFromFileName(postFiles[i]);
+      p.type = type;
+      p.id = dataJson[p.url].id;
+      p.title = dataJson[p.url].title;
+
+      posts.push(p);
+    }
   }
+
+  return posts;
 }
 
 function getFiles (dir){
@@ -139,7 +127,7 @@ function savePost(){
         if(err) {
           console.log(err);
         } else {
-          console.log("The file was saved!");
+          console.log("Saved: " + path + post.url + '.md');
         }
       }
   );
@@ -207,6 +195,9 @@ function savePost(){
   for(var i in postFiles){
     // get just the file name without full path or extension
     index = getFieldFromFileName(postFiles[i]);
+    if(index === '_data'){
+      continue;
+    }
     if(!dataJson[index]){
       // Delete the file
       fs.unlink(postFiles[i], function (err) {

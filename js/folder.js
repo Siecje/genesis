@@ -8,10 +8,11 @@ var exec = require('child_process').exec;
 var uuid = require('uuid');
 var Showdown = require('showdown');
 
-// var Promise = require("bluebird");
-// Promise.promisifyAll(fs);
 // Initialize Showdown converter
 var converter = new Showdown.converter();
+
+//var Promise = require("bluebird");
+//Promise.promisifyAll(fs);
 
 // Variables that start with dom are DOM elements
 var domMarkdown = document.getElementById('postMarkdown');
@@ -211,10 +212,10 @@ function savePost(){
 
   show(posts, 'posts');
   show(pages, 'pages');
-  /*exec('./node_modules/harp/bin/harp compile output build', function(error, stdout){
+  exec('./node_modules/harp/bin/harp compile output build', function(error, stdout){
     console.log(error);
     console.log(stdout);
-  });*/
+  });
 }
 
 function deleteActivePost(){

@@ -8,8 +8,8 @@ var exec = require('child_process').exec;
 var uuid = require('uuid');
 var Showdown = require('showdown');
 
-var Promise = require("bluebird");
-Promise.promisifyAll(fs);
+// var Promise = require("bluebird");
+// Promise.promisifyAll(fs);
 // Initialize Showdown converter
 var converter = new Showdown.converter();
 

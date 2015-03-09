@@ -20,7 +20,7 @@ var posts = loadPosts('output/blog/');
 var pages = loadPosts('output/');
 
 // Global to hold the current post to display/edit
-var post = {};
+var post = {type: 'post'};
 
 show(posts, 'posts');
 show(pages, 'pages');
@@ -119,6 +119,31 @@ function savePost(){
   });
 }
 
+function deleteActivePost(){
+  var path = post.type === 'post' ? 'output/blog/' : 'output/';
+  var index;
+  if(post.type === 'post'){
+    index = posts.indexOf(post);
+    posts.splice(index, 1);
+    show(posts, 'posts');
+  }
+  else if(post.type === 'page'){
+    index = pages.indexOf(post);
+    pages.splice(index, 1);
+    show(pages, 'pages');
+  }
+
+  var fileName = path + post.title + '.md';
+  fs.unlinkSync(fileName);
+
+  post = {};
+  post.title = '';
+  post.text = '';
+
+  updateView();
+  console.log('successfully deleted ' + fileName);
+}
+
 function load(type, postTitle){
   if (type === 'post'){
     for(var i in posts){
@@ -139,9 +164,6 @@ function load(type, postTitle){
 }
 
 function show(items, elemId){
-  if (items.length === 0){
-    return;
-  }
   var elem = document.getElementById(elemId);
   elem.innerHTML = '';
   for(var i in items){

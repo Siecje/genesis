@@ -71,24 +71,21 @@ function loadPosts(directory){
         if(postFiles[i].indexOf('.md') < 0){
           continue;
         }
-        post = fs.readFileSync(postFiles[i], 'utf8', function (err, data) {
-          if (err) {
-            return console.log(err);
-          }
-          return data;
-        });
-        if(post){
-          lines = post.split('\n');
-          p = {};
-          p.text = post;
-          // p.url is the file name without extension
-          p.url = getFieldFromFileName(postFiles[i]);
-          p.type = type;
-          p.id = dataJson[p.url].id;
-          p.title = dataJson[p.url].title;
+        fs.readFileAsync(postFiles[i]).then(function(val){
+          post = val;
+          if(post){
+            lines = post.split('\n');
+            p = {};
+            p.text = post;
+            // p.url is the file name without extension
+            p.url = getFieldFromFileName(postFiles[i]);
+            p.type = type;
+            p.id = dataJson[p.url].id;
+            p.title = dataJson[p.url].title;
 
-          posts.push(p);
-        }
+            posts.push(p);
+          }
+        });
       }
       resolve(posts);
     })
@@ -100,23 +97,31 @@ function loadPosts(directory){
     });
   });
 
-
   return pinkyPromise;
 }
 
 function getFiles (dir){
   var fileNames = [];
-  var files = fs.readdirSync(dir);
-  var name = '';
-  for (var i in files){
-    name = dir + '/' + files[i];
-    if (!fs.statSync(name).isDirectory()){
-      if(name.indexOf('.keep') < 0){
-        fileNames.push(name);
+  var files;
+  var promise = new Promise(function(resolve, reject){
+    fs.readdirAsync(dir).then(function(val){
+      files = val;
+      var name = '';
+      for (var i in files){
+        name = dir + '/' + files[i];
+        if (!fs.statAsync(name).then(function(val){
+          if (val.isDirectory()){
+            if(name.indexOf('.keep') < 0){
+              fileNames.push(name);
+            }
+          }
+        }));
       }
-    }
-  }
-  return fileNames;
+      resolve(fileNames);
+    });
+  });
+
+  return promise;
 }
 
 function savePost(){
@@ -193,8 +198,6 @@ function savePost(){
 
   dataJson[urlData] = postData;
 
-  console.log(dataJson);
-  console.log(JSON.stringify(dataJson));
   // write dataJson back to _data.json
   fs.writeFile(path + '_data.json',
     JSON.stringify(dataJson),
@@ -208,30 +211,32 @@ function savePost(){
   );
 
   // Delete files that are not a key in dataJson
-  var postFiles = getFiles(path);
-  var index;
-  for(var i in postFiles){
-    // get just the file name without full path or extension
-    index = getFieldFromFileName(postFiles[i]);
-    if(index === '_data'){
-      continue;
+  var postFiles = getFiles(path).then(function(val){
+    postFiles = val;
+    var index;
+    for(var i in postFiles){
+      // get just the file name without full path or extension
+      index = getFieldFromFileName(postFiles[i]);
+      if(index === '_data'){
+        continue;
+      }
+      if(!dataJson[index]){
+        // Delete the file
+        fs.unlink(postFiles[i], function (err) {
+          if (err){
+            throw err;
+          }
+          console.log('successfully deleted ' + postFiles[i]);
+        });
+      }
     }
-    if(!dataJson[index]){
-      // Delete the file
-      fs.unlink(postFiles[i], function (err) {
-        if (err){
-          throw err;
-        }
-        console.log('successfully deleted ' + postFiles[i]);
-      });
-    }
-  }
 
-  show(posts, 'posts');
-  show(pages, 'pages');
-  exec('./node_modules/harp/bin/harp compile output build', function(error, stdout){
-    console.log(error);
-    console.log(stdout);
+    show(posts, 'posts');
+    show(pages, 'pages');
+    exec('./node_modules/harp/bin/harp compile output build', function(error, stdout){
+      console.log(error);
+      console.log(stdout);
+    });
   });
 }
 
@@ -250,14 +255,14 @@ function deleteActivePost(){
   }
 
   var fileName = path + post.title + '.md';
-  fs.unlinkSync(fileName);
+  fs.unlinkAsync(fileName).then(function(val){
+    post = {};
+    post.title = '';
+    post.text = '';
 
-  post = {};
-  post.title = '';
-  post.text = '';
-
-  updateView();
-  console.log('successfully deleted ' + fileName);
+    updateView();
+    console.log('successfully deleted ' + fileName);
+  });
 }
 
 function load(type, postTitle){

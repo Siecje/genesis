@@ -1431,6 +1431,10 @@ hr {
   margin-top: 4px;
 }
 
+.vh100 {
+  height: 100vh;
+}
+
 /**
  * Mac UI Styles
  */

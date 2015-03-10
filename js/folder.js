@@ -11,8 +11,8 @@ var Showdown = require('showdown');
 // Initialize Showdown converter
 var converter = new Showdown.converter();
 
-//var Promise = require("bluebird");
-//Promise.promisifyAll(fs);
+var Promise = require("bluebird");
+Promise.promisifyAll(fs);
 
 // Variables that start with dom are DOM elements
 var domMarkdown = document.getElementById('postMarkdown');
@@ -20,14 +20,21 @@ var domHtml = document.getElementById('postHTML');
 var domTitle = document.getElementById('title');
 
 // TODO: use config value for posts directory
-var posts = loadPosts('output/blog/');
-var pages = loadPosts('output/');
+var posts = [];
+var postsPromise = loadPosts('output/blog/');
+postsPromise.then(function(result){
+  posts = result;
+  show(posts, 'posts');
+});
+var pages = [];
+var pagesPromise = loadPosts('output/');
+pagesPromise.then(function(result){
+  pages = result;
+  show(pages, 'pages');
+});
 
 // Global to hold the current post to display/edit
 var post = {type: 'post'};
-
-show(posts, 'posts');
-show(pages, 'pages');
 
 function updateView(){
   domTitle.value = post.title;
@@ -53,38 +60,48 @@ function loadPosts(directory){
   var postFiles = getFiles(directory);
   var posts = [];
 
-  var dataJson = {};
-  var data = fs.readFileSync(directory + '_data.json');
-  dataJson = JSON.parse(data);
+  var pinkyPromise = new Promise(function(resolve, reject){
+    var dataJson = {};
+    var filePromise = fs.readFileAsync(directory + '_data.json').then(JSON.parse).then(function(val) {
+      dataJson = val;
+      var post = {};
+      var p = {};
+      var lines;
+      for (var i in postFiles){
+        if(postFiles[i].indexOf('.md') < 0){
+          continue;
+        }
+        post = fs.readFileSync(postFiles[i], 'utf8', function (err, data) {
+          if (err) {
+            return console.log(err);
+          }
+          return data;
+        });
+        if(post){
+          lines = post.split('\n');
+          p = {};
+          p.text = post;
+          // p.url is the file name without extension
+          p.url = getFieldFromFileName(postFiles[i]);
+          p.type = type;
+          p.id = dataJson[p.url].id;
+          p.title = dataJson[p.url].title;
 
-  var post = {};
-  var p = {};
-  var lines;
-  for (var i in postFiles){
-    if(postFiles[i].indexOf('.md') < 0){
-      continue;
-    }
-    post = fs.readFileSync(postFiles[i], 'utf8', function (err, data) {
-      if (err) {
-        return console.log(err);
+          posts.push(p);
+        }
       }
-      return data;
+      resolve(posts);
+    })
+    .catch(SyntaxError, function(e) {
+      console.error("invalid json in file");
+    })
+    .catch(function(e){
+      console.error("unable to read file")
     });
-    if(post){
-      lines = post.split('\n');
-      p = {};
-      p.text = post;
-      // p.url is the file name without extension
-      p.url = getFieldFromFileName(postFiles[i]);
-      p.type = type;
-      p.id = dataJson[p.url].id;
-      p.title = dataJson[p.url].title;
+  });
 
-      posts.push(p);
-    }
-  }
 
-  return posts;
+  return pinkyPromise;
 }
 
 function getFiles (dir){

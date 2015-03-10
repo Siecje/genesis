@@ -57,21 +57,25 @@ function getPostFromFile(fileData){
 
 function loadPosts(directory){
   var type = directory === 'output/blog/' ? 'post' : 'page';
-  var postFiles = getFiles(directory);
-  var posts = [];
-
+  var postFiles = [];
+  var dataJson = {};
   var pinkyPromise = new Promise(function(resolve, reject){
-    var dataJson = {};
-    var filePromise = fs.readFileAsync(directory + '_data.json').then(JSON.parse).then(function(val) {
+    getFiles(directory).then(function(val){
+      postFiles = val;
+      return fs.readFileAsync(directory + '_data.json');
+    })
+    .then(JSON.parse).then(function(val) {
       dataJson = val;
+
       var post = {};
       var p = {};
       var lines;
+      var filePromises = [];
       for (var i in postFiles){
         if(postFiles[i].indexOf('.md') < 0){
           continue;
         }
-        fs.readFileAsync(postFiles[i]).then(function(val){
+        filePromises.push(fs.readFileAsync(postFiles[i]).then(function(val){
           post = val;
           if(post){
             lines = post.split('\n');
@@ -82,12 +86,13 @@ function loadPosts(directory){
             p.type = type;
             p.id = dataJson[p.url].id;
             p.title = dataJson[p.url].title;
-
-            posts.push(p);
+              posts.push(p);
           }
-        });
+        }));
       }
-      resolve(posts);
+      Promise.all(filePromises).then(function(){
+        resolve(posts);
+      });
     })
     .catch(SyntaxError, function(e) {
       console.error("invalid json in file");
@@ -96,7 +101,7 @@ function loadPosts(directory){
       console.error("unable to read file")
     });
   });
-
+  
   return pinkyPromise;
 }
 

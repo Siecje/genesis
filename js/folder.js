@@ -101,7 +101,7 @@ function loadPosts(directory){
       console.error("unable to read file")
     });
   });
-  
+
   return pinkyPromise;
 }
 
@@ -161,20 +161,15 @@ function savePost(){
   );
 
   // read _data.json and update properties
-  // TODO: code smell duplicated code with loadPosts
   var dataJson = {};
   fs.readFile(path + '_data.json', function(err, data) {
     if (err) {
       if (err.code === "ENOENT") {
         /* File doesn't exist, setting {} instead. */
         dataJson = {};
-        //doneGettingJSON();
-      } else {
-        /* Some other kind of error happened - you need to handle it, somehow. */
       }
     }else {
       dataJson = JSON.parse(data);
-      //return doneGettingJSON();
     }
   });
 
@@ -194,8 +189,13 @@ function savePost(){
     urlData = post.url;
   }
 
-  postData.title = post.title;
-  postData.id = post.id;
+  var keys = Object.keys(post);
+  for(var i in keys){
+    if(keys[i] !== 'text'){
+      postData[keys[i]] = post[keys[i]];
+    }
+  }
+
   // If the url is change remove the object for the old url value
   if (post.url != urlData){
     delete dataJson[urlData];

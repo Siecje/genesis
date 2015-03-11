@@ -115,3 +115,23 @@ document.getElementById('preview').addEventListener('click', function() {
     liveServer.stop();
   }
 });
+
+// HAHA HOW DID THIS GET SO CONFUSING I'M SO SORRY
+var activeListItem = document.querySelectorAll('#posts > li > a, #pages > li > a');
+
+for(var i = 0; i < activeListItem.length; i++) {
+  activeListItem[i].addEventListener('click', function(e) {
+    removeActive(activeListItem, e, setActive);
+  });
+}
+
+function removeActive(list, e, callback) {
+  for(var j = 0; j < list.length; j++) {
+    list[j].classList.remove('bg-blue', 'white');
+  }
+  callback(e);
+}
+
+function setActive(e) {
+  e.currentTarget.classList.add('bg-blue', 'white');
+}

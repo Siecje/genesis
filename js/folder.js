@@ -1,5 +1,5 @@
 'use strict';
-
+//postFiles.map(function(promise) { return promise.then(pLogicFn); })
 /**
  * Module dependencies
  */
@@ -23,18 +23,18 @@ var domTitle = document.getElementById('title');
 var posts = [];
 var postsPromise = loadPosts('output/blog/');
 postsPromise.then(function(result){
-  posts = result;
+  posts = result || [];
   show(posts, 'posts');
 });
 var pages = [];
 var pagesPromise = loadPosts('output/');
 pagesPromise.then(function(result){
-  pages = result;
+  pages = result || [];
   show(pages, 'pages');
 });
 
 // Global to hold the current post to display/edit
-var post = {type: 'post'};
+var post = {type: 'post', title: '', text: ''};
 
 function updateView(){
   domTitle.value = post.title;
@@ -55,78 +55,92 @@ function getPostFromFile(fileData){
   return fileData.substring(start+2, fileData.length-1);
 }
 
-function loadPosts(directory){
-  var type = directory === 'output/blog/' ? 'post' : 'page';
-  var postFiles = [];
-  var dataJson = {};
-  var pinkyPromise = new Promise(function(resolve, reject){
-    getFiles(directory).then(function(val){
-      postFiles = val;
-      return fs.readFileAsync(directory + '_data.json');
-    })
-    .then(JSON.parse).then(function(val) {
-      dataJson = val;
+function getFromFile(dataJson, fileName, type){
+  return fs.readFileAsync(fileName).then(function(val){
+    var post = val.toString();
+    var p;
+    var url = getFieldFromFileName(fileName);
 
-      var post = {};
-      var p = {};
-      var lines;
+    return {
+      text: post,
+      // url is the file name without extension
+      url: url,
+      type: type,
+      id: dataJson[url].id,
+      title: dataJson[url].title
+    };
+  });
+}
+
+function loadPosts(directory){
+  var type;
+  var posts = [];
+
+  return Promise.try(function(){
+    type = (directory === 'output/blog/' ? 'post' : 'page');
+    return Promise.all([
+      getFiles(directory),
+      fs.readFileAsync(directory + '_data.json').then(function(val){
+        return JSON.parse(val.toString());})
+    ])
+  }).spread(function(postFiles, dataJson) {
+      var postObject;
       var filePromises = [];
       for (var i in postFiles){
         if(postFiles[i].indexOf('.md') < 0){
           continue;
         }
-        filePromises.push(fs.readFileAsync(postFiles[i]).then(function(val){
-          post = val;
-          if(post){
-            lines = post.split('\n');
-            p = {};
-            p.text = post;
-            // p.url is the file name without extension
-            p.url = getFieldFromFileName(postFiles[i]);
-            p.type = type;
-            p.id = dataJson[p.url].id;
-            p.title = dataJson[p.url].title;
-              posts.push(p);
-          }
-        }));
+        filePromises.push(getFromFile(dataJson, postFiles[i], type));
       }
-      Promise.all(filePromises).then(function(){
-        resolve(posts);
-      });
+      return Promise.all(filePromises);
     })
     .catch(SyntaxError, function(e) {
+      console.error(e);
       console.error("invalid json in file");
     })
     .catch(function(e){
       console.error("unable to read file")
     });
-  });
+}
 
-  return pinkyPromise;
+function fileExistsPromise(fileName){
+  return fs.statAsync(fileName).then(function(statData){
+    return Promise.resolve({filename: fileName, statData: statData});
+  });
 }
 
 function getFiles (dir){
-  var fileNames = [];
-  var files;
-  var promise = new Promise(function(resolve, reject){
-    fs.readdirAsync(dir).then(function(val){
-      files = val;
-      var name = '';
-      for (var i in files){
-        name = dir + '/' + files[i];
-        if (!fs.statAsync(name).then(function(val){
-          if (val.isDirectory()){
-            if(name.indexOf('.keep') < 0){
-              fileNames.push(name);
-            }
-          }
-        }));
-      }
-      resolve(fileNames);
-    });
-  });
+  return Promise.try(function(){
+    return fs.readdirAsync(dir);
+  }).then(function(files) {
+    var filePromises = [];
+    var name = '';
+    var  filePromise;
 
-  return promise;
+    for (var i in files){
+      name = dir + '/' + files[i];
+      filePromise = fileExistsPromise(name);
+
+      filePromises.push(filePromise);
+    }
+
+    return Promise.all(filePromises);
+  }).then(function(results) {
+    var validItems = [];
+    var name;
+    var statData;
+
+    for (var i in results) {
+      name = results[i].filename;
+      statData = results[i].statData;
+      if(statData.isDirectory() === false){
+        if(name.indexOf('.keep') < 0) {
+          validItems.push(name);
+        }
+      }
+    }
+    return Promise.resolve(validItems);
+  });
 }
 
 function savePost(){
@@ -138,7 +152,7 @@ function savePost(){
     post.url = post.title;
   }
 
-  var path = post.type === 'post' ? 'output/blog/' : 'output/';
+  var path = (post.type === 'post' ? 'output/blog/' : 'output/');
   if(post.type === 'post' && !post.id){
     post.id = uuid.v4();
     posts.push(post);
@@ -161,87 +175,86 @@ function savePost(){
   );
 
   // read _data.json and update properties
-  var dataJson = {};
-  fs.readFile(path + '_data.json', function(err, data) {
-    if (err) {
-      if (err.code === "ENOENT") {
-        /* File doesn't exist, setting {} instead. */
-        dataJson = {};
+  fileExistsPromise(path + '_data.json').then(function(val){
+    return val.filename;
+  }).then(function(fileName){
+    return fs.readFileAsync(fileName).then(function(val){
+      return JSON.parse(val.toString());
+    });
+  }).catch(function(err) {
+    /* You should check here whether the error is that the file doesn't exist... */
+    return Promise.resolve({});
+  }).then(function(dataJson){
+    // iterate through dataJson find the object with the id
+    var postData = {};
+    var urlData;
+    for(var url in dataJson){
+      if(dataJson[url].id === post.id){
+        urlData = url;
+        postData = dataJson[url];
       }
-    }else {
-      dataJson = JSON.parse(data);
     }
-  });
 
-  // iterate through dataJson find the object with the id
-  var postData = {};
-  var urlData;
-  for(var url in dataJson){
-    if(dataJson[url].id === post.id){
-      urlData = url;
-      postData = dataJson[url];
+    // If it is a new post not in data.json
+    // TODO: is this the best way to check if postData === {}
+    if(postData.length === undefined){
+      urlData = post.url;
     }
-  }
 
-  // If it is a new post not in data.json
-  // TODO: is this the best way to check if postData === {}
-  if(postData.length === undefined){
-    urlData = post.url;
-  }
-
-  var keys = Object.keys(post);
-  for(var i in keys){
-    if(keys[i] !== 'text'){
-      postData[keys[i]] = post[keys[i]];
+    var keys = Object.keys(post);
+    for(var i in keys){
+      if(keys[i] !== 'text'){
+        postData[keys[i]] = post[keys[i]];
+      }
     }
-  }
 
-  // If the url is change remove the object for the old url value
-  if (post.url != urlData){
-    delete dataJson[urlData];
-  }
+    // If the url is change remove the object for the old url value
+    if (post.url != urlData){
+      delete dataJson[urlData];
+    }
 
-  dataJson[urlData] = postData;
+    dataJson[urlData] = postData;
 
-  // write dataJson back to _data.json
-  fs.writeFile(path + '_data.json',
-    JSON.stringify(dataJson),
-      function(err) {
-        if(err) {
-          console.log(err);
-        } else {
-          console.log('Saved: ' + path + '_data.json');
+    // write dataJson back to _data.json
+    fs.writeFile(path + '_data.json',
+      JSON.stringify(dataJson),
+        function(err) {
+          if(err) {
+            console.log(err);
+          } else {
+            console.log('Saved: ' + path + '_data.json');
+          }
+        }
+    );
+
+    // Delete files that are not a key in dataJson
+    var postFiles = getFiles(path).then(function(val){
+      postFiles = val;
+      var index;
+      for(var i in postFiles){
+        if(postFiles[i].indexOf('.md') < 0){
+          continue;
+        }
+        // get just the file name without full path or extension
+        index = getFieldFromFileName(postFiles[i]);
+        if(!dataJson[index]){
+          // Delete the file
+          fs.unlink(postFiles[i], function (err) {
+            if (err){
+              throw err;
+            }
+            console.log('successfully deleted ' + postFiles[i]);
+          });
         }
       }
-  );
-
-  // Delete files that are not a key in dataJson
-  var postFiles = getFiles(path).then(function(val){
-    postFiles = val;
-    var index;
-    for(var i in postFiles){
-      // get just the file name without full path or extension
-      index = getFieldFromFileName(postFiles[i]);
-      if(index === '_data'){
-        continue;
-      }
-      if(!dataJson[index]){
-        // Delete the file
-        fs.unlink(postFiles[i], function (err) {
-          if (err){
-            throw err;
-          }
-          console.log('successfully deleted ' + postFiles[i]);
-        });
-      }
-    }
-
-    show(posts, 'posts');
-    show(pages, 'pages');
-    exec('./node_modules/harp/bin/harp compile output build', function(error, stdout){
-      console.log(error);
-      console.log(stdout);
     });
+
+      show(posts, 'posts');
+      show(pages, 'pages');
+      exec('./node_modules/harp/bin/harp compile output build', function(error, stdout){
+        console.log(error);
+        console.log(stdout);
+      });
   });
 }
 
@@ -293,8 +306,12 @@ function show(items, elemId){
   var elem = document.getElementById(elemId);
   elem.innerHTML = '';
   for(var i in items){
-    elem.innerHTML += "<li><a href='#' onclick='load(\"" + items[i].type + "\", \"" + items[i].title + "\")' class='small m0 px1 py1 block'>" + items[i].title + "</a></li>";
+    elem.innerHTML += "<li><a href='#' onclick='load(\"" + items[i].type + "\", \"" + items[i].title + "\");' class='small m0 px1 py1 block'>" + items[i].title + "</a></li>";
   }
+}
+
+function highlight(){
+
 }
 
 function newItem(type) {

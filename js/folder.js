@@ -32,9 +32,6 @@ pagesPromise.then(function(result){
   pages = result || [];
   show(pages, 'pages');
 });
-Promise.all([postsPromise, pagesPromise]).then(function(){
-  highlight();
-});
 
 // Global to hold the current post to display/edit
 var post = {type: 'post', title: '', text: ''};
@@ -309,8 +306,14 @@ function show(items, elemId){
   var elem = document.getElementById(elemId);
   elem.innerHTML = '';
   for(var i in items){
-    elem.innerHTML += "<li><a href='#' onclick='load(\"" + items[i].type + "\", \"" + items[i].title + "\");' class='small m0 px1 py1 block'>" + items[i].title + "</a></li>";
+    if (items[i] === post){
+      elem.innerHTML += "<li><a href='#' onclick='load(\"" + items[i].type + "\", \"" + items[i].title + "\");' class='small m0 px1 py1 block bg-blue white'>" + items[i].title + "</a></li>";
+    }
+    else{
+      elem.innerHTML += "<li><a href='#' onclick='load(\"" + items[i].type + "\", \"" + items[i].title + "\");' class='small m0 px1 py1 block'>" + items[i].title + "</a></li>";
+    }
   }
+  highlight();
 }
 
 function removeActive(list, e, callback) {

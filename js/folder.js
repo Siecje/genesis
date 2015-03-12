@@ -32,6 +32,9 @@ pagesPromise.then(function(result){
   pages = result || [];
   show(pages, 'pages');
 });
+Promise.all([postsPromise, pagesPromise]).then(function(){
+  highlight();
+});
 
 // Global to hold the current post to display/edit
 var post = {type: 'post', title: '', text: ''};
@@ -82,7 +85,7 @@ function loadPosts(directory){
       getFiles(directory),
       fs.readFileAsync(directory + '_data.json').then(function(val){
         return JSON.parse(val.toString());})
-    ])
+    ]);
   }).spread(function(postFiles, dataJson) {
       var postObject;
       var filePromises = [];
@@ -310,8 +313,25 @@ function show(items, elemId){
   }
 }
 
-function highlight(){
+function removeActive(list, e, callback) {
+  for(var j = 0; j < list.length; j++) {
+    list[j].classList.remove('bg-blue', 'white');
+  }
+  callback(e);
+}
 
+function setActive(e) {
+  e.currentTarget.classList.add('bg-blue', 'white');
+}
+
+function highlight(){
+  var activeListItem = document.querySelectorAll('#posts > li > a, #pages > li > a');
+
+  for(var i = 0; i < activeListItem.length; i++) {
+    activeListItem[i].addEventListener('click', function(e) {
+      removeActive(activeListItem, e, setActive);
+    });
+  }
 }
 
 function newItem(type) {

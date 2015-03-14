@@ -29,8 +29,11 @@
           <li class='icon inline-block icon-group-wrapper-brl' onclick='deleteActivePost()'>
             <i class='fa fa-trash-o gray blue-h'></i>
           </li>
-          <li class='icon inline-block' onclick='showSettings()'>
+          <li class='icon inline-block icon-group-wrapper-brl' onclick='showSettings(true)'>
             <i class='fa fa-cog gray blue-h'></i>
+          </li>
+          <li class='icon inline-block' onclick='showSettings(false)'>
+            <i class='fa fa-pencil gray blue-h'></i>
           </li>
         </ul>
       </span>
@@ -129,7 +132,8 @@
 
       </div>
       <button type='button' onclick='addSetting();'>Add</button>
-      <button type='button' onclick='saveSettings();'>Save</button>
+      <button id='save-global' type='button' onclick='saveSettings(true);'>Save</button>
+      <button id='save-post' type='button' onclick='saveSettings(false);'>Save</button>
     </main>
 
     <!-- Scripts -->

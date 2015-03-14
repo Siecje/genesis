@@ -1,0 +1,20 @@
+div(class='post-preview')
+  a(href='#{post.url}')
+    h2(class='post-title') #{post.title}
+    if post.subtitle
+      h3(class='post-subtitle') #{post.subtitle}
+    if showText
+      // TODO: Only first 255 characters
+      p #{post.text}
+      //include "blog/#{post.url}.md"
+    if post.author || siteAuthor
+      p(class='post-meta') Posted by
+        // TODO: Get url for author
+        a(href='author/#{post.author}') #{post.author || siteAuthor}
+    if post.tags
+      p
+        for tag in post.tags
+          // TODO: Get url for a tag
+          a(href='tag/#{post.tag}') #{tag}
+
+hr

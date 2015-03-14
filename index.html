@@ -23,11 +23,17 @@
         </span>
 
         <ul class='icon-group-wrapper top-bar-bs inline-block ml2'>
-          <li class='icon inline-block icon-group-wrapper-brl'>
-            <i class='fa fa-floppy-o gray blue-h' onclick='savePost()'></i>
+          <li class='icon inline-block icon-group-wrapper-brl' onclick='savePost()'>
+            <i class='fa fa-floppy-o gray blue-h'></i>
           </li>
-          <li class='icon inline-block'>
-            <i class='fa fa-trash-o gray blue-h' onclick='deleteActivePost()'></i>
+          <li class='icon inline-block icon-group-wrapper-brl' onclick='deleteActivePost()'>
+            <i class='fa fa-trash-o gray blue-h'></i>
+          </li>
+          <li class='icon inline-block icon-group-wrapper-brl' onclick='showSettings(true)'>
+            <i class='fa fa-cog gray blue-h'></i>
+          </li>
+          <li class='icon inline-block' onclick='showSettings(false)'>
+            <i class='fa fa-pencil gray blue-h'></i>
           </li>
         </ul>
       </span>
@@ -119,8 +125,19 @@
 
     </main>
 
-  <!-- Scripts -->
-  <script src='app.js'></script>
-  <script src='js/folder.js'></script>
+    <!-- Global Settings -->
+    <main class='z1 absolute overflow-y-auto top-bar-offset bottom-0 left-0 sidebar-offset right-0' id='settings' style="display: none;">
+      <h1>Settings</h1>
+      <div id='settings-table'>
+
+      </div>
+      <button type='button' onclick='addSetting();'>Add</button>
+      <button id='save-global' type='button' onclick='saveSettings(true);'>Save</button>
+      <button id='save-post' type='button' onclick='saveSettings(false);'>Save</button>
+    </main>
+
+    <!-- Scripts -->
+    <script src='app.js'></script>
+    <script src='js/folder.js'></script>
   </body>
 </html>

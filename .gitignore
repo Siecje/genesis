@@ -5,3 +5,4 @@ output/*.md
 output/blog/*.md
 output/_data.json
 output/blog/_data.json
+output/_harp.json

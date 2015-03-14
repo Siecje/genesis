@@ -1,5 +1,1 @@
-{
-  "globals": {
-    "site": "Cody"
-  }
-}
+{"globals":{"blogBase":"blog/","domain":"localhost:9000"}}

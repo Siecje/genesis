@@ -1,0 +1,6 @@
+article
+  h1 All Authors
+
+  for author in public.authors._data
+    div(class='post-preview')
+      a(href='author/#{author}') #{author}

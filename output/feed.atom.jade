@@ -1,0 +1,21 @@
+doctype xml
+feed(xmlns='http://www.w3.org/2005/Atom')
+  title(type="text") #{siteDescription}
+  subtitle #{feedSubtitle}
+  link(href='#{feedUrl}', rel='self')
+  link(href='#{siteUrl}')
+  id #{feedUrl}
+  updated #{buildDate}
+  generator Genesis
+  // TODO: use variable path for posts
+  // instead of public.blog public.[setting]._data
+  for post in public.blog._data
+      entry(xml:base='#{feedUrl}')
+        title #{post.title}
+        id #{post.id}
+        link(href='#{post.url}')
+        author
+          name #{post.author}
+        updated #{post.updated}
+        content(type='html')
+          #{post.text}

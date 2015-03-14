@@ -1,0 +1,20 @@
+div(class='post-preview')
+  a(href='#{post.url}')
+    h2(class='post-title') #{post.title}
+    if post.subtitle
+      h3(class='post-subtitle') #{post.subtitle}
+    if showText
+      // TODO: Only first 255 characters
+      // TODO: Use blog url base
+      include 'blog/' + post.url + .md
+    if post.author || siteAuthor
+      p(class='post-meta') Posted by
+        // TODO: how to get url for author
+        a(href='#') #{post.author || siteAuthor}
+    if post.tags
+      p
+        for tag in post.tags
+          // TODO: how to get url for a tag
+          a(href='#') #{tag}
+
+hr

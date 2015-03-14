@@ -1,6 +1,45 @@
-doctype
-html
+doctype html
+html(lang='en')
   head
-    link(rel="stylesheet" href="/main.css")
+    meta(charset='utf-8')
+    meta(http-equiv='X-UA-Compatible', content='IE=edge')
+    meta(name='viewport', content='width=device-width, initial-scale=1')
+
+    // Site wide elements
+    if siteName
+      meta(property='og:site_name', content='#{siteName}')
+    // Facebook specific tags
+    if fbAppId
+      meta(property='fb:app_id', content='#{fbAppId}')
+    if fbSite
+      meta(property='article:publisher', content='#{fbSite}')
+    // Twitter specific tags
+    if twitterSite
+      meta(name='twitter.card', content='summary')
+      meta(name='twitter:site', content='twitterSite')
+
+    // Page elements
+    if description
+      meta(name='description', content='#{description}')
+    if tags
+      meta(name='keywords', content='#{tags}')
+
+    // Open Graph Tags
+    if type
+      meta(property='og:type' content='article')
+      meta(property='og:url', content='#{url}')
+      meta(property='og:title', content='#{title}')
+      if description
+        meta(property='og:description', content='#{description}')
+      if image || siteLogo
+        meta(property='og:image', content='#{image || siteLogo}')
+      if fbUrl || siteFb
+        meta(property='article:author', content='#{fbUrl || siteFb}')
+      if twitter || siteTwitter
+        meta(name='twitter:creator', content='#{twitter || siteTwitter}')
+
+    title #{title}
+
+    link(rel='stylesheet' href='/main.css')
   body
     != yield

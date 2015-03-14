@@ -5,7 +5,6 @@
  */
 var fs = require('fs');
 var exec = require('child_process').exec;
-var uuid = require('uuid');
 var Showdown = require('showdown');
 
 // Initialize Showdown converter
@@ -143,9 +142,24 @@ function getFiles (dir){
   });
 }
 
+function createDate(post){
+  var date = new Date();
+  return date.getYear() + '-' + date.getMonth() + '-' +  date.getDay();
+}
+
+function createId(post){
+  // TODO: use domain and posts url base
+  // TODO: instead of localhost and /blog/
+  return 'tag:' + 'localhost' + ',' + post.updated + ':' + '/blog/' + post.url
+}
+
 function savePost(){
   if(post.title === '' && post.text === ''){
     return;
+  }
+
+  if(!post.updated){
+    post.updted = createDate(post);
   }
 
   if(!post.url){
@@ -154,11 +168,11 @@ function savePost(){
 
   var path = (post.type === 'post' ? 'output/blog/' : 'output/');
   if(post.type === 'post' && !post.id){
-    post.id = uuid.v4();
+    post.id = createId(post);
     posts.push(post);
   }
   else if(post.type === 'page' && !post.id){
-    post.id = uuid.v4();
+    post.id = createId(post);
     pages.push(post);
   }
 

@@ -1,2 +1,8 @@
-h1= site
-h3 This is yours to own. Enjoy.
+h1 #{site}
+h3 This is yours to own #{site}. Enjoy.
+
+// TODO: use variable path for posts
+// instead of public.blog public.[setting]._data
+- var showText = true
+for post in public.blog._data
+  include _list

@@ -6,7 +6,8 @@ div(class='post-preview')
     if showText
       // TODO: Only first 255 characters
       // TODO: Use blog url base
-      include 'blog/' + post.url + .md
+      include "#{markdownFile}"
+      //include "blog/#{post.url}.md"
     if post.author || siteAuthor
       p(class='post-meta') Posted by
         // TODO: how to get url for author

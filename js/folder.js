@@ -144,7 +144,7 @@ function getFiles (dir){
 
 function createDate(post){
   var date = new Date();
-  return date.getYear() + '-' + date.getMonth() + '-' +  date.getDay();
+  return date.getFullYear() + '-' + date.getMonth() + '-' +  date.getDay();
 }
 
 function createId(post){
@@ -159,12 +159,13 @@ function savePost(){
   }
 
   if(!post.updated){
-    post.updted = createDate(post);
+    post.updated = createDate(post);
   }
 
   if(!post.url){
     post.url = post.title;
   }
+  console.log(post);
 
   var path = (post.type === 'post' ? 'output/blog/' : 'output/');
   if(post.type === 'post' && !post.id){
@@ -217,9 +218,7 @@ function savePost(){
 
     var keys = Object.keys(post);
     for(var i in keys){
-      if(keys[i] !== 'text'){
-        postData[keys[i]] = post[keys[i]];
-      }
+      postData[keys[i]] = post[keys[i]];
     }
 
     // If the url is change remove the object for the old url value
@@ -286,14 +285,34 @@ function deleteActivePost(){
     show(pages, 'pages');
   }
 
-  var fileName = path + post.title + '.md';
-  fs.unlinkAsync(fileName).then(function(val){
-    post = {};
-    post.title = '';
-    post.text = '';
+  // remove post from _data.json
+  fs.readFileAsync(path + '_data.json').then(function(val){
+    var dataJson = JSON.parse(val.toString());
+    console.log(dataJson);
+    console.log(post);
+    console.log(post.url);
+    delete dataJson[post.url];
+    console.log(dataJson);
+    // write dataJson back to _data.json
+    fs.writeFile(path + '_data.json',
+      JSON.stringify(dataJson),
+        function(err) {
+          if(err) {
+            console.log(err);
+          } else {
+            console.log('Saved: ' + path + '_data.json');
+          }
+        }
+    );
+    var fileName = path + post.url + '.md';
+    fs.unlinkAsync(fileName).then(function(val){
+      post = {};
+      post.title = '';
+      post.text = '';
 
-    updateView();
-    console.log('successfully deleted ' + fileName);
+      updateView();
+      console.log('successfully deleted ' + fileName);
+    });
   });
 }
 

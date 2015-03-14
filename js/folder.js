@@ -153,6 +153,102 @@ function createId(post){
   return 'tag:' + 'localhost' + ',' + post.updated + ':' + '/blog/' + post.url
 }
 
+function addTag(post){
+  // load Tags
+  var tagPath = 'tags/';
+  fileExistsPromise(tagPath + '_data.json').then(function(val){
+    return val.filename;
+  }).then(function(fileName){
+    return fs.readFileAsync(fileName).then(function(val){
+      return JSON.parse(val.toString());
+    });
+  }).catch(function(err) {
+    /* You should check here whether the error is that the file doesn't exist... */
+    return Promise.resolve({});
+  }).then(function(dataJson){
+    for(var i in post.tags){
+      // dataJson[post.tags[i]] = dataJson[post.tags[i]] || [];
+      // dataJson[post.tags[i]].push(tag);
+      if(dataJson[post.tags[i]]){
+        // check if post is already in tag
+        var added = false;
+        for(var j in dataJson[post.tags[i]]){
+          if (dataJson[post.tags[i]][j].id === post.id){
+            added = true;
+            dataJson[post.tags[i]][j] = post;
+          }
+        }
+        if(!added){
+          dataJson[post.tags[i]].push(tag);
+        }
+      }
+      else{
+        dataJson[post.tags[i]] = [post];
+      }
+    }
+
+    // write dataJson back to file
+    fs.writeFile(path + '_data.json',
+      JSON.stringify(dataJson),
+        function(err) {
+          if(err) {
+            console.log(err);
+          } else {
+            console.log('Saved: ' + path + '_data.json');
+          }
+        }
+    );
+  });
+}
+
+function addAuthor(post){
+  // load Authors
+  var authorPath = 'authors/';
+  fileExistsPromise(authorPath + '_data.json').then(function(val){
+    return val.filename;
+  }).then(function(fileName){
+    return fs.readFileAsync(fileName).then(function(val){
+      return JSON.parse(val.toString());
+    });
+  }).catch(function(err) {
+    /* You should check here whether the error is that the file doesn't exist... */
+    return Promise.resolve({});
+  }).then(function(dataJson){
+    for(var i in post.authors){
+      // dataJson[post.tags[i]] = dataJson[post.tags[i]] || [];
+      // dataJson[post.tags[i]].push(tag);
+      if(dataJson[post.authors[i]]){
+        // check if post is already in tag
+        var added = false;
+        for(var j in dataJson[post.authors[i]]){
+          if (dataJson[post.authors[i]][j].id === post.id){
+            added = true;
+            dataJson[post.authors[i]][j] = post;
+          }
+        }
+        if(!added){
+          dataJson[post.authors[i]].push(tag);
+        }
+      }
+      else{
+        dataJson[post.authors[i]] = [post];
+      }
+    }
+
+    // write dataJson back to file
+    fs.writeFile(path + '_data.json',
+      JSON.stringify(dataJson),
+        function(err) {
+          if(err) {
+            console.log(err);
+          } else {
+            console.log('Saved: ' + path + '_data.json');
+          }
+        }
+    );
+  });
+}
+
 function savePost(){
   if(post.title === '' && post.text === ''){
     return;
@@ -165,7 +261,14 @@ function savePost(){
   if(!post.url){
     post.url = post.title;
   }
-  console.log(post);
+
+  if(post.tags){
+    addTag(post);
+  }
+  if(post.author){
+    addAuthor(post);
+  }
+
 
   var path = (post.type === 'post' ? 'output/blog/' : 'output/');
   if(post.type === 'post' && !post.id){
@@ -264,6 +367,8 @@ function savePost(){
 
       show(posts, 'posts');
       show(pages, 'pages');
+      // TODO: does not work on Windows
+      // TODO: cmd: "C:\Windows\system32\cmd.exe /s /c "./node_modules/harp/bin/harp compile output build""
       exec('./node_modules/harp/bin/harp compile output build', function(error, stdout){
         console.log(error);
         console.log(stdout);
@@ -288,11 +393,8 @@ function deleteActivePost(){
   // remove post from _data.json
   fs.readFileAsync(path + '_data.json').then(function(val){
     var dataJson = JSON.parse(val.toString());
-    console.log(dataJson);
-    console.log(post);
-    console.log(post.url);
     delete dataJson[post.url];
-    console.log(dataJson);
+
     // write dataJson back to _data.json
     fs.writeFile(path + '_data.json',
       JSON.stringify(dataJson),
@@ -386,3 +488,70 @@ domMarkdown.addEventListener('keyup', function() {
 domTitle.addEventListener('keyup', function(){
   post.title = domTitle.value;
 });
+
+function showSettings(){
+  var main = document.getElementById('main');
+  var settings = document.getElementById('settings');
+  if (main.style.display === 'none'){
+    main.style.display = 'initial';
+    settings.style.display = 'none';
+  }
+  else{
+    main.style.display = 'none';
+    settings.style.display = 'block';
+    populateSettings();
+  }
+}
+
+function populateSettings(){
+  // Get global settings
+  fileExistsPromise('output/_harp.json').then(function(val){
+    return val.filename;
+  }).then(function(fileName){
+    return fs.readFileAsync(fileName).then(function(val){
+      return JSON.parse(val.toString());
+    });
+  }).catch(function(err) {
+    /* You should check here whether the error is that the file doesn't exist... */
+    return Promise.resolve({});
+  }).then(function(dataJson){
+    console.log(dataJson);
+    var settings = document.getElementById('settings-table');
+    settings.innerHTML = '';
+    var keys = Object.keys(dataJson['globals']);
+    console.log(keys);
+    for(var i in keys){
+      settings.innerHTML += '<input type="text" value="' + keys[i] + '">' +
+      '<input type="text" value="' + dataJson['globals'][keys[i]] + '"><br>';
+    }
+  });
+}
+
+function addSetting(){
+  var settings = document.getElementById('settings-table');
+  settings.innerHTML += '<input type="text" value=""><input type="text" value=""><br>';
+}
+
+function saveSettings(){
+  var settings = document.getElementById('settings-table');
+  var inputs = settings.getElementsByTagName('input');
+  // every odd input is a key
+  // the next input is the value
+  var i = 0;
+  var dataJson = {'globals': {}};
+  while(i+1 < inputs.length){
+    dataJson['globals'][inputs[i].value] = inputs[i+1].value;
+    i += 2;
+  }
+  // save dataJson in _harp.js
+  fs.writeFile('output/_harp.json',
+    JSON.stringify(dataJson),
+      function(err) {
+        if(err) {
+          console.log(err);
+        } else {
+          console.log('Saved: output/_harp.json');
+        }
+      }
+  );
+}

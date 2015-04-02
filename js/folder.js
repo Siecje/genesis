@@ -72,7 +72,6 @@ function writeFile(fileName, data){
 }
 
 function updateView(){
-  console.log(posts);
   domTitle.value = post.title;
   domMarkdown.value = post.text;
   domHtml.innerHTML = converter.makeHtml(domMarkdown.value);
@@ -108,8 +107,6 @@ function loadPosts(directory){
   var posts = [];
 
   return Promise.try(function(){
-    console.log(config);
-    console.log(config.blogBase);
     type = (directory === 'output/' + config.blogBase ? 'post' : 'page');
     return Promise.all([
       getFiles(directory),
@@ -187,7 +184,6 @@ function createId(post){
   if(post.id){
     return post.id;
   }
-  console.log(config);
   return 'tag:' + config.domain + ',' + post.updated + ':' + config.blogBase + post.url
 }
 
@@ -375,8 +371,6 @@ function deleteActivePost(){
 }
 
 function load(type, postTitle){
-  console.log(type);
-  console.log(postTitle);
   if (type === 'post'){
     for(var i in posts){
       if (posts[i].title === postTitle){
@@ -393,6 +387,7 @@ function load(type, postTitle){
       }
     }
   }
+  populateSettings(false);
 }
 
 function show(items, elemId){

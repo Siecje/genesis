@@ -18,26 +18,28 @@ var domMarkdown = document.getElementById('postMarkdown');
 var domHtml = document.getElementById('postHTML');
 var domTitle = document.getElementById('title');
 
-var config = {};
-readJSONFile('output/_harp.json').then(function(val){
-  config = val;
-});
 
 // posts and pages are global because savePost is called from the DOM
 // posts and pages could be stringified and passed in
 // as long as we update the DOM when posts and pages
-var posts = [];
-var postsPromise = loadPosts('output/' + config.blogBase);
-postsPromise.then(function(result){
-  posts = result || [];
-  show(posts, 'posts');
-});
 
+var posts = [];
 var pages = [];
-var pagesPromise = loadPosts('output/');
-pagesPromise.then(function(result){
-  pages = result || [];
-  show(pages, 'pages');
+
+var config = {};
+readJSONFile('output/_harp.json').then(function(val){
+  config = val.globals;
+  var postsPromise = loadPosts('output/' + config.blogBase);
+  postsPromise.then(function(result){
+    posts = result || [];
+    show(posts, 'posts');
+  });
+
+  var pagesPromise = loadPosts('output/');
+  pagesPromise.then(function(result){
+    pages = result || [];
+    show(pages, 'pages');
+  });
 });
 
 // Global to hold the current post to display/edit
@@ -70,6 +72,7 @@ function writeFile(fileName, data){
 }
 
 function updateView(){
+  console.log(posts);
   domTitle.value = post.title;
   domMarkdown.value = post.text;
   domHtml.innerHTML = converter.makeHtml(domMarkdown.value);
@@ -105,7 +108,9 @@ function loadPosts(directory){
   var posts = [];
 
   return Promise.try(function(){
-    type = (directory === config.blogBase ? 'post' : 'page');
+    console.log(config);
+    console.log(config.blogBase);
+    type = (directory === 'output/' + config.blogBase ? 'post' : 'page');
     return Promise.all([
       getFiles(directory),
       fs.readFileAsync(directory + '_data.json').then(function(val){
@@ -182,6 +187,7 @@ function createId(post){
   if(post.id){
     return post.id;
   }
+  console.log(config);
   return 'tag:' + config.domain + ',' + post.updated + ':' + config.blogBase + post.url
 }
 
@@ -369,6 +375,8 @@ function deleteActivePost(){
 }
 
 function load(type, postTitle){
+  console.log(type);
+  console.log(postTitle);
   if (type === 'post'){
     for(var i in posts){
       if (posts[i].title === postTitle){
@@ -401,6 +409,13 @@ function show(items, elemId){
   highlight();
 }
 
+function removeActiveSelection(){
+  var activeListItem = document.querySelectorAll('#posts > li > a, #pages > li > a');
+  for(var j = 0; j < activeListItem.length; j++) {
+    activeListItem[j].classList.remove('bg-blue', 'white');
+  }
+}
+
 function removeActive(list, e, callback) {
   for(var j = 0; j < list.length; j++) {
     list[j].classList.remove('bg-blue', 'white');
@@ -423,6 +438,11 @@ function highlight(){
 }
 
 function newItem(type) {
+  var main = document.getElementById('main');
+  if (main.style.display === 'none'){
+    showSettings();
+  }
+  removeActiveSelection();
   post = {title: '', text: '', type: type};
   updateView();
 }

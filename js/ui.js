@@ -7,13 +7,13 @@ exports.saveShortcutOptions = {
 
   active : function() {
 
-    console.log('Global desktop keyboard shortcut: ' + this.key + ' active.'); 
+    console.log('Global desktop keyboard shortcut: ' + this.key + ' active.');
   },
 
   failed : function(msg) {
 
     // :(, fail to register the |key| or couldn't parse the |key|.
-    console.log(msg);
+    console.error(msg);
   }
 };
 
@@ -27,7 +27,7 @@ exports.newShortcutOptions = {
   },
   failed: function(msg) {
 
-    console.log(msg);
+    console.error(msg);
   }
 };
 

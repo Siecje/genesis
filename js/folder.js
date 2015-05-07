@@ -63,7 +63,7 @@ function writeFile(fileName, data){
   fs.writeFile(fileName, data,
       function(err) {
         if(err) {
-          console.log(err);
+          console.error(err);
         } else {
           console.log('Saved: ' + fileName);
         }
@@ -330,7 +330,7 @@ function savePost(){
     // TODO: does not work on Windows
     // TODO: cmd: "C:\Windows\system32\cmd.exe /s /c "./node_modules/harp/bin/harp compile output build""      exec('./node_modules/harp/bin/harp compile output build', function(error, stdout){
     exec('./node_modules/harp/bin/harp compile output build', function(error, stdout){
-      console.log(error);
+      console.error(error);
       console.log(stdout);
     });
   });

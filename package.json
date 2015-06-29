@@ -1,74 +1,47 @@
 {
-    "nodejs": true,
-    "additional_trust_anchors": "",
-    "inject-js-end": "",
-    "node-remote": "",
-    "keywords": [
-        "static",
-        "site",
-        "generator",
-        "genesis"
-    ],
-    "author": "Cody Scott, Ben Tranter",
-    "user-agent": "",
-    "window": {
-        "fullscreen": false,
-        "resizable": false,
-        "title": "genesis",
-        "always-on-top": false,
-        "frame": true,
-        "visible": true,
-        "height": 600,
-        "exe_icon": "",
-        "width": 800,
-        "as_desktop": false,
-        "position": "",
-        "show_in_taskbar": true,
-        "mac_icon": "",
-        "transparent": false,
-        "toolbar": true,
-        "icon": ""
-    },
-    "version": "0.0.1",
-    "inject-js-start": "",
-    "main": "index.html",
-    "chromium-args": "",
-    "webexe_settings": {
-        "linux-x32": false,
-        "windows-x64": true,
-        "download_dir": "C:\\Users\\Cody\\Downloads\\nwjs-v0.12.0-win-x64\\nwjs-v0.12.0-win-x64",
-        "nw_compression_level": 5,
-        "mac-x32": false,
-        "windows-x32": false,
-        "mac-x64": false,
-        "nw_version": "0.12.0-rc1",
-        "force_download": false,
-        "linux-x64": false
-    },
-    "description": "Generate static sites without using the command line.",
-    "repository": {
-        "url": "http://github.com/siecje/genesis",
-        "type": "git"
-    },
-    "dependencies": {
-        "showdown": "^0.4.0",
-        "surge": "^0.7.4",
-        "harp": "^0.15.2",
-        "bluebird": "^2.9.13",
-        "live-server": "^0.7.0"
-    },
-    "scripts": {
-        "test": "jasmine-node tests"
-    },
-    "webkit": {
-        "page-cache": false,
-        "java": false,
-        "plugin": false
-    },
-    "js-flags": "",
-    "name": "genesis",
-    "license": "MIT",
-    "single-instance": true,
-    "snapshot": "",
-    "node-main": ""
+  "keywords": [
+    "static",
+    "site",
+    "generator",
+    "genesis"
+  ],
+  "author": "Cody Scott, Ben Tranter",
+  "window": {
+    "fullscreen": false,
+    "resizable": false,
+    "title": "genesis",
+    "always-on-top": false,
+    "frame": true,
+    "visible": true,
+    "height": 600,
+    "exe_icon": "",
+    "width": 800,
+    "as_desktop": false,
+    "position": "",
+    "show_in_taskbar": true,
+    "mac_icon": "",
+    "transparent": false,
+    "toolbar": true,
+    "icon": ""
+  },
+  "version": "0.0.1",
+  "main": "index.html",
+  "description": "Generate static sites without using the command line.",
+  "repository": {
+    "url": "http://github.com/siecje/genesis",
+    "type": "git"
+  },
+  "dependencies": {
+    "bluebird": "^2.9.13",
+    "harp": "^0.15.2",
+    "live-server": "^0.7.0",
+    "showdown": "^0.4.0",
+    "surge": "^0.7.4"
+  },
+  "scripts": {
+    "test": "jasmine-node tests"
+  },
+  "name": "genesis",
+  "license": "MIT",
+  "single-instance": true
 }

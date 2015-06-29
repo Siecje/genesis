@@ -111,7 +111,13 @@ function loadPosts(directory){
     return Promise.all([
       getFiles(directory),
       fs.readFileAsync(directory + '_data.json').then(function(val){
-        return JSON.parse(val.toString());})
+        return JSON.parse(val.toString());
+      }).catch(function(err){
+        // Create file
+        fs.writeFile(directory + '_data.json', '{}').then(function() {
+          console.log(directory + '_data.json created.');
+        });
+      })
     ]);
   }).spread(function(postFiles, dataJson) {
       var postObject;

@@ -5,10 +5,8 @@
  */
 var fs = require('fs');
 var exec = require('child_process').exec;
-var Showdown = require('showdown');
-
-// Initialize Showdown converter
-var converter = new Showdown.converter();
+var showdown  = require('showdown'),
+    converter = new showdown.Converter();
 
 var Promise = require("bluebird");
 Promise.promisifyAll(fs);

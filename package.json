@@ -35,7 +35,7 @@
     "bluebird": "^2.9.13",
     "harp": "^0.15.2",
     "live-server": "^0.7.0",
-    "showdown": "^0.4.0",
+    "showdown": "^1.1.0",
     "surge": "^0.7.4"
   },
   "scripts": {

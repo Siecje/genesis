@@ -58,15 +58,11 @@ function readJSONFile(fileName){
 }
 
 function writeFile(fileName, data){
-  fs.writeFile(fileName, data,
-      function(err) {
-        if(err) {
-          console.error(err);
-        } else {
-          console.log('Saved: ' + fileName);
-        }
-      }
-  );
+  fs.writeFileAsync(fileName, data).then(function(result){
+    console.log('Saved: ' + fileName);
+  }).catch(function(err){
+    console.error(err);
+  });
 }
 
 function updateView(){
@@ -112,7 +108,7 @@ function loadPosts(directory){
         return JSON.parse(val.toString());
       }).catch(function(err){
         // Create file
-        fs.writeFile(directory + '_data.json', '{}').then(function() {
+        fs.writeFileAsync(directory + '_data.json', '{}').then(function() {
           console.log(directory + '_data.json created.');
         });
       })
@@ -520,7 +516,7 @@ function saveSettings(showGlobal){
       }
     }
 
-    fs.writeFile(fileName, JSON.stringify(dataJson));
+    fs.writeFileAsync(fileName, JSON.stringify(dataJson));
   });
 }
 
